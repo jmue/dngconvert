@@ -1,0 +1,4 @@
+CMakeLists.txt.user
+libdng/contrib/dng_sdk/source/
+libdng/contrib/xmpsdk/include/
+libdng/contrib/xmpsdk/src/
