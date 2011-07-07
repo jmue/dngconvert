@@ -1,16 +1,20 @@
 
 FIND_PACKAGE( EXPAT )
 INCLUDE_DIRECTORIES( ${EXPAT_INCLUDE_DIR} )
+ADD_DEFINITIONS(${EXPAT_DEFINITIONS})
  
 FIND_PACKAGE( JPEG )
 INCLUDE_DIRECTORIES( ${JPEG_INCLUDE_DIR} )
+ADD_DEFINITIONS(${JPEG_DEFINITIONS})
  
 # =======================================================
 # XMP SDK source code.
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src
-                    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/include
-#                    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/include/client-glue
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source
+                    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/common
+                    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/public/include
+                    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/build
+                    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/third-party/MD5
                    )
 
 # Set platteforms env.
@@ -20,42 +24,30 @@ IF(WIN32)
                     -DWIN_ENV=1
                    )
 ELSE(WIN32)
-    IF(APPLE)
-        ADD_DEFINITIONS(
-                        # Set MACOS-X rules.
-                        -DMAC_ENV=1
-                       )
-    ELSE(APPLE)
-        ADD_DEFINITIONS(
-                        # Set Linux & co rules.
-                        -DUNIX_ENV=1
-                       )
-    ENDIF(APPLE)
+    ADD_DEFINITIONS(
+                    # Set MACOS-X, Linux & co rules.
+                    -DUNIX_ENV=1
+                   )
 ENDIF(WIN32)
 
 SET( LIBXMPSDK_SRCS
-#    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/include/XMP.incl_cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/include/client-glue/TXMPIterator.incl_cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/include/client-glue/TXMPMeta.incl_cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/include/client-glue/TXMPUtils.incl_cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/ExpatAdapter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/MD5.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/ParseRDF.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/UnicodeConversions.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/UnicodeInlines.incl_cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/WXMPIterator.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/WXMPMeta.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/WXMPUtils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XML_Node.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XMPCore_Impl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XMPIterator.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XMP_LibUtils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XMPMeta.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XMPMeta-GetSet.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XMPMeta-Parse.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XMPMeta-Serialize.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XMPUtils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/src/XMPUtils-FileInfo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/ExpatAdapter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/third-party/MD5/MD5.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/ParseRDF.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/common/UnicodeConversions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/WXMPIterator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/WXMPMeta.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/WXMPUtils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/common/XML_Node.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/XMPCore_Impl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/XMPIterator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/common/XMP_LibUtils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/XMPMeta.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/XMPMeta-GetSet.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/XMPMeta-Parse.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/XMPMeta-Serialize.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/XMPUtils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/XMPUtils-FileInfo.cpp
    )
 
 ADD_LIBRARY( xmpsdk STATIC ${LIBXMPSDK_SRCS} )
@@ -75,22 +67,14 @@ IF(WIN32)
                     -DqMacOS=0
                    )
 ELSE(WIN32)
-    IF(APPLE)
-        ADD_DEFINITIONS(
-                        # Set MACOS-X rules.
-                        -DqWinOS=0
-                        -DqMacOS=1
-                       )
-    ELSE(APPLE)
-        ADD_DEFINITIONS(
-                        # Set Linux & co rules.
-                        -DqWinOS=0
-                        -DqMacOS=0
+    ADD_DEFINITIONS(
+                    # Set MACOS-X, Linux & co rules.
+                    -DqWinOS=0
+                    -DqMacOS=0
 
-                        # Must be set to 1, else do not compile under Linux.
-                        -DqDNGUseStdInt=1
-                       )
-    ENDIF(APPLE)
+                    # Must be set to 1, else do not compile under Linux.
+                    -DqDNGUseStdInt=1
+                   )
 ENDIF(WIN32)
 
 # Check processor endianness
@@ -174,7 +158,6 @@ SET( LIBDNGSDK_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/dng_sdk/source/dng_pthread.cpp
    )
 
-#TARGET_LINK_LIBRARIES( LIBDNGSDK LIBXMPSDK)
 ADD_LIBRARY( dngsdk STATIC ${LIBDNGSDK_SRCS} )
 
 TARGET_LINK_LIBRARIES( dngsdk xmpsdk )
