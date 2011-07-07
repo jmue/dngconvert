@@ -1,0 +1,12 @@
+diff -u -r -N xmpsdk.orig//public/include/XMP_Environment.h xmpsdk//public/include/XMP_Environment.h
+--- xmpsdk.orig//public/include/XMP_Environment.h	2010-05-05 15:01:58.000000000 +0200
++++ xmpsdk//public/include/XMP_Environment.h	2011-07-07 21:41:32.666279158 +0200
+@@ -115,6 +115,8 @@
+ // =================================================================================================
+ // UNIX Specific Settings
+ // ======================
++#include <cstring>
++#include <stdio.h>
+ 
+ // =================================================================================================
+ 

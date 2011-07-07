@@ -1,0 +1,49 @@
+diff -u -r -N dng_sdk.orig//source/dng_hue_sat_map.h dng_sdk//source/dng_hue_sat_map.h
+--- dng_sdk.orig//source/dng_hue_sat_map.h	2009-06-22 20:06:59.000000000 +0200
++++ dng_sdk//source/dng_hue_sat_map.h	2011-07-07 21:41:55.306391400 +0200
+@@ -126,7 +126,7 @@
+ 			return (HSBModify *) fDeltas.Buffer_real32 ();
+ 			}
+ 
+-		bool dng_hue_sat_map::operator== (const dng_hue_sat_map &rhs) const;
++                bool operator== (const dng_hue_sat_map &rhs) const;
+ 		
+ 		static dng_hue_sat_map * Interpolate (const dng_hue_sat_map &map1,
+ 											  const dng_hue_sat_map &map2,
+diff -u -r -N dng_sdk.orig//source/dng_sdk_limits.h dng_sdk//source/dng_sdk_limits.h
+--- dng_sdk.orig//source/dng_sdk_limits.h	2009-06-22 20:06:59.000000000 +0200
++++ dng_sdk//source/dng_sdk_limits.h	2011-07-07 22:16:41.900738279 +0200
+@@ -22,6 +22,7 @@
+ 
+ /*****************************************************************************/
+ 
++#include <climits>
+ #include "dng_types.h"
+ 
+ /*****************************************************************************/
+diff -u -r -N dng_sdk.orig//source/dng_xmp_sdk.cpp dng_sdk//source/dng_xmp_sdk.cpp
+--- dng_sdk.orig//source/dng_xmp_sdk.cpp	2009-06-22 20:07:00.000000000 +0200
++++ dng_sdk//source/dng_xmp_sdk.cpp	2011-07-07 22:13:22.303748538 +0200
+@@ -46,6 +46,7 @@
+ #endif
+ 
+ #define TXMP_STRING_TYPE std::string
++#include "XMP.hpp"
+ 
+ #include "XMP.incl_cpp"
+ 
+@@ -1282,10 +1283,10 @@
+ 		try
+ 			{
+ 
+-			SXMPUtils::AppendProperties (*xmp->fPrivate->fMeta,
+-									     fPrivate->fMeta,
+-										 kXMPUtil_DoAllProperties |
+-										 kXMPUtil_ReplaceOldValues);
++                        SXMPUtils::ApplyTemplate (xmp->fPrivate->fMeta,
++                                                                             *fPrivate->fMeta,
++                                                                                 kXMPUtil_DoAllProperties |
++                                                                                 kXMPUtil_ReplaceOldValues);
+ 			
+ 			}
+ 			
