@@ -152,7 +152,7 @@ int main(int argc, const char* argv [])
     negative->SetColorChannels(rawImage->Channels());
 
     ColorKeyCode colorCodes[4] = {colorKeyMaxEnum, colorKeyMaxEnum, colorKeyMaxEnum, colorKeyMaxEnum};
-    for(uint32 i = 0; i < std::max((uint32)4, rawImage->Channels()); i++)
+    for(uint32 i = 0; i < 4; i++)
     {
         switch(imgdata.idata.cdesc[i])
         {
@@ -209,22 +209,22 @@ int main(int argc, const char* argv [])
             negative->SetBayerMosaic(bayerMosaic);
     }
 
-    negative->SetWhiteLevel(imgdata.color.maximum, 0);
-    negative->SetWhiteLevel(imgdata.color.maximum, 1);
-    negative->SetWhiteLevel(imgdata.color.maximum, 2);
-    negative->SetWhiteLevel(imgdata.color.maximum, 3);
+    negative->SetWhiteLevel(rawImage->WhiteLevel(0), 0);
+    negative->SetWhiteLevel(rawImage->WhiteLevel(1), 1);
+    negative->SetWhiteLevel(rawImage->WhiteLevel(2), 2);
+    negative->SetWhiteLevel(rawImage->WhiteLevel(3), 3);
 
     const dng_mosaic_info* mosaicinfo = negative->GetMosaicInfo();
     if ((mosaicinfo != NULL) && (mosaicinfo->fCFAPatternSize == dng_point(2, 2)))
     {
-        negative->SetQuadBlacks(imgdata.color.black + imgdata.color.cblack[0],
-                                imgdata.color.black + imgdata.color.cblack[1],
-                                imgdata.color.black + imgdata.color.cblack[2],
-                                imgdata.color.black + imgdata.color.cblack[3]);
+        negative->SetQuadBlacks(rawImage->BlackLevel(0),
+                                rawImage->BlackLevel(1),
+                                rawImage->BlackLevel(2),
+                                rawImage->BlackLevel(3));
     }
     else
     {
-        negative->SetBlackLevel(imgdata.color.black + imgdata.color.cblack[0], 0);
+        negative->SetBlackLevel(rawImage->BlackLevel(0), 0);
     }
 
     negative->SetBaselineExposure(0.0);

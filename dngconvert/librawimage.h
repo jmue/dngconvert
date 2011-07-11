@@ -44,6 +44,8 @@ public:
     const dng_rect& FinalSize() const;
     uint32 Channels() const;
     const dng_matrix& ColorMatrix() const;
+    const real64 BlackLevel(uint32 channel) const;
+    const real64 WhiteLevel(uint32 channel) const;
 
 protected:
     virtual void AcquireTileBuffer(dng_tile_buffer &buffer, const dng_rect &area,	bool dirty) const;
@@ -60,4 +62,6 @@ protected:
     dng_string m_MakeName;
     uint32 m_Channels;
     dng_matrix m_ColorMatrix;
+    dng_vector m_WhiteLevel;
+    dng_vector m_BlackLevel;
 };

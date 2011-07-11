@@ -188,6 +188,14 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
 
     m_Channels = m_Imgdata.idata.colors;
 
+    m_BlackLevel = dng_vector(4);
+    m_WhiteLevel = dng_vector(4);
+    for (int i = 0; i < 4; i++)
+    {
+        m_BlackLevel[i] = m_Imgdata.color.black + m_Imgdata.color.cblack[i];
+        m_WhiteLevel[i] = m_Imgdata.color.maximum;
+    }
+
     switch (m_Imgdata.idata.colors)
     {
     case 3:
@@ -337,4 +345,24 @@ uint32 LibRawImage::Channels() const
 const dng_matrix& LibRawImage::ColorMatrix() const
 {
     return m_ColorMatrix;
+}
+
+const real64 LibRawImage::BlackLevel(uint32 channel) const
+{
+    if (channel < m_BlackLevel.Count())
+    {
+        return m_BlackLevel[channel];
+    }
+
+    return 0.0;
+}
+
+const real64 LibRawImage::WhiteLevel(uint32 channel) const
+{
+    if (channel < m_WhiteLevel.Count())
+    {
+        return m_WhiteLevel[channel];
+    }
+
+    return 0.0;
 }
