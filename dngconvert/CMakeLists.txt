@@ -1,4 +1,6 @@
 
+# =======================================================
+# dngconvert command line tool
 
 SET( EXIV2_MIN_VERSION "0.21" )
 FIND_PACKAGE( Exiv2 )
@@ -86,3 +88,4 @@ TARGET_LINK_LIBRARIES(dngconvert ${ZLIB_LIBRARIES}
                                  ${CMAKE_THREAD_LIBS_INIT}
                                  dng)
 
+#INSTALL(TARGETS dngconvert ${INSTALL_TARGETS_DEFAULT_ARGS})
