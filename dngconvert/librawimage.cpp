@@ -78,8 +78,10 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
         return;
     }
 
+    bool entireSensorData = false;
     if (0 == strcmp(rawProcessor->imgdata.idata.make, "Canon") && (rawProcessor->imgdata.idata.filters != 0))
     {
+        entireSensorData = true;
         ret = rawProcessor->add_masked_borders_to_bitmap();
         if (ret != LIBRAW_SUCCESS)
         {
@@ -87,16 +89,6 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
             rawProcessor->recycle();
             return;
         }
-
-        m_ActiveArea = dng_rect(rawProcessor->imgdata.sizes.top_margin,
-                                rawProcessor->imgdata.sizes.left_margin,
-                                rawProcessor->imgdata.sizes.iheight - rawProcessor->imgdata.sizes.bottom_margin,
-                                rawProcessor->imgdata.sizes.iwidth - rawProcessor->imgdata.sizes.right_margin);
-    }
-    else
-    {
-        m_ActiveArea = dng_rect(rawProcessor->imgdata.sizes.iheight,
-                                rawProcessor->imgdata.sizes.iwidth);
     }
 
     libraw_data_t imgdata = rawProcessor->imgdata;
@@ -109,7 +101,12 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
         fujiRotate90 = true;
         imgdata.sizes.iheight = rawProcessor->imgdata.sizes.iwidth;
         imgdata.sizes.iwidth = rawProcessor->imgdata.sizes.iheight;
+        imgdata.sizes.top_margin = rawProcessor->imgdata.sizes.left_margin;
+        imgdata.sizes.left_margin = rawProcessor->imgdata.sizes.bottom_margin;
+        imgdata.sizes.bottom_margin = rawProcessor->imgdata.sizes.right_margin;
+        imgdata.sizes.right_margin = rawProcessor->imgdata.sizes.top_margin;
         imgdata.sizes.flip = 6;
+        m_FinalSize = dng_rect(m_FinalSize.W(), m_FinalSize.H());
     }
 
     fBounds = dng_rect(imgdata.sizes.iheight, imgdata.sizes.iwidth);
@@ -175,6 +172,19 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
                 }
             }
         }
+    }
+
+    if (entireSensorData == true)
+    {
+        m_ActiveArea = dng_rect(imgdata.sizes.top_margin,
+                                imgdata.sizes.left_margin,
+                                imgdata.sizes.iheight - imgdata.sizes.bottom_margin,
+                                imgdata.sizes.iwidth - imgdata.sizes.right_margin);
+    }
+    else
+    {
+        m_ActiveArea = dng_rect(imgdata.sizes.iheight,
+                                imgdata.sizes.iwidth);
     }
 
     m_CameraNeutral = dng_vector(rawProcessor->imgdata.idata.colors);
