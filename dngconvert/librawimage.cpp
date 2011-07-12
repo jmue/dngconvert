@@ -90,8 +90,8 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
 
         m_ActiveArea = dng_rect(rawProcessor->imgdata.sizes.top_margin,
                                 rawProcessor->imgdata.sizes.left_margin,
-                                rawProcessor->imgdata.sizes.iheight - m_Imgdata.sizes.bottom_margin,
-                                rawProcessor->imgdata.sizes.iwidth - m_Imgdata.sizes.right_margin);
+                                rawProcessor->imgdata.sizes.iheight - rawProcessor->imgdata.sizes.bottom_margin,
+                                rawProcessor->imgdata.sizes.iwidth - rawProcessor->imgdata.sizes.right_margin);
     }
     else
     {
