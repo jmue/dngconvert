@@ -85,7 +85,7 @@ void compareExif(const dng_exif& exif1, const dng_exif& exif2)
     //     (exif1.fDateTimeStorageInfo.Offset() != exif2.fDateTimeStorageInfo.Offset())))
     //  printf("    DateTimeStorageInfo\n");
     if (exif1.fDigitalZoomRatio.As_real64() != exif2.fDigitalZoomRatio.As_real64())
-        printf("    DigitalZoomRatio: %.1 %.1f\n", exif1.fDigitalZoomRatio.As_real64(), exif2.fDigitalZoomRatio.As_real64());
+        printf("    DigitalZoomRatio: %.1f %.1f\n", exif1.fDigitalZoomRatio.As_real64(), exif2.fDigitalZoomRatio.As_real64());
     if (exif1.fExifVersion != exif2.fExifVersion)
         printf("    ExifVersion: %d %d\n", exif1.fExifVersion, exif2.fExifVersion);
     if (exif1.fExposureBiasValue.As_real64() != exif2.fExposureBiasValue.As_real64())
@@ -280,7 +280,9 @@ void compareExif(const dng_exif& exif1, const dng_exif& exif2)
 void compareIfd(const dng_ifd& ifd1, const dng_ifd& ifd2)
 {
     if (ifd1.fActiveArea != ifd2.fActiveArea)
-        printf("    ActiveArea\n");
+        printf("    ActiveArea (t/l/b/r): %d/%d/%d/%d %d/%d/%d/%d\n",
+               ifd1.fActiveArea.t, ifd1.fActiveArea.l, ifd1.fActiveArea.b, ifd1.fActiveArea.r,
+               ifd2.fActiveArea.t, ifd2.fActiveArea.l, ifd2.fActiveArea.b, ifd2.fActiveArea.r);
     if (ifd1.fAntiAliasStrength.As_real64() != ifd2.fAntiAliasStrength.As_real64())
         printf("    AntiAliasStrength\n");
     if (ifd1.fBayerGreenSplit != ifd2.fBayerGreenSplit)
@@ -480,7 +482,7 @@ void compareNegative(const dng_negative& negative1, const dng_negative& negative
     if (negative1.BaselineSharpness() != negative2.BaselineSharpness())
         printf("    BaselineSharpness: %.1f %.1f\n", negative1.BaselineSharpness(), negative2.BaselineSharpness());
     if (negative1.BaseOrientation() != negative2.BaseOrientation())
-        printf("    BaseOrientation: %d %d\n", negative1.BaseOrientation(), negative2.BaseOrientation());
+        printf("    BaseOrientation: %d %d\n", negative1.BaseOrientation().GetAdobe(), negative2.BaseOrientation().GetAdobe());
     //if (negative1.BestQualityFinalHeight() != negative2.BestQualityFinalHeight())
     //  printf("    BestQualityFinalHeight: %d %d\n", negative1.BestQualityFinalHeight(), negative2.BestQualityFinalHeight());
     //if (negative1.BestQualityFinalWidth() != negative2.BestQualityFinalWidth())
@@ -547,8 +549,8 @@ void compareNegative(const dng_negative& negative1, const dng_negative& negative
         printf("    ModelName: '%s' '%s'\n", negative1.ModelName().Get(), negative2.ModelName().Get());
     if (negative1.NoiseReductionApplied().As_real64() != negative2.NoiseReductionApplied().As_real64())
         printf("    NoiseReductionApplied: %.1f %.1f\n", negative1.NoiseReductionApplied().As_real64(), negative2.NoiseReductionApplied().As_real64());
-    if (negative1.Orientation() != negative2.Orientation())
-        printf("    Orientation: %d %d\n", negative1.Orientation(), negative2.Orientation());
+    //if (negative1.Orientation() != negative2.Orientation())
+    //    printf("    Orientation: %d %d\n", negative1.Orientation(), negative2.Orientation());
     if (negative1.OriginalRawFileDataLength() != negative2.OriginalRawFileDataLength())
         printf("    OriginalRawFileDataLength: %d %d\n", negative1.OriginalRawFileDataLength(), negative2.OriginalRawFileDataLength());
     if (0 != memcmp(negative1.OriginalRawFileDigest().data, negative2.OriginalRawFileDigest().data, 16 * sizeof(uint8)))

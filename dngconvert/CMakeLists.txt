@@ -1,6 +1,4 @@
 
-# =======================================================
-# dngconvert command line tool
 
 SET( EXIV2_MIN_VERSION "0.21" )
 FIND_PACKAGE( Exiv2 )
@@ -38,22 +36,14 @@ IF(WIN32)
                     -DqMacOS=0
                    )
 ELSE(WIN32)
-    IF(APPLE)
-        ADD_DEFINITIONS(
-                        # Set MACOS-X rules.
-                        -DqWinOS=0
-                        -DqMacOS=1
-                       )
-    ELSE(APPLE)
-        ADD_DEFINITIONS(
-                        # Set Linux & co rules.
-                        -DqWinOS=0
-                        -DqMacOS=0
+    ADD_DEFINITIONS(
+                    # Set MACOS-X, Linux & co rules.
+                    -DqWinOS=0
+                    -DqMacOS=0
 
-                        # Must be set to 1, else do not compile under Linux.
-                        -DqDNGUseStdInt=1
-                       )
-    ENDIF(APPLE)
+                    # Must be set to 1, else do not compile under Linux.
+                    -DqDNGUseStdInt=1
+                   )
 ENDIF(WIN32)
 
 # Check processor endianness
@@ -88,4 +78,3 @@ TARGET_LINK_LIBRARIES(dngconvert ${ZLIB_LIBRARIES}
                                  ${CMAKE_THREAD_LIBS_INIT}
                                  dng)
 
-#INSTALL(TARGETS dngconvert ${INSTALL_TARGETS_DEFAULT_ARGS})

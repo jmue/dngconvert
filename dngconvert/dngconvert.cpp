@@ -70,8 +70,9 @@ int main(int argc, const char* argv [])
                 "dngconvert - DNG convertion tool\n"
                 "Usage: %s [options] <dngfile>\n"
                 "Valid options:\n"
+                "  -e                embed original\n"
                 "  -p <filename>     use camera profile\n"
-                "  -e                embed original\n",
+                "  -x <filename>     read EXIF from this file\n",
                 argv[0]);
 
         return -1;
@@ -80,6 +81,7 @@ int main(int argc, const char* argv [])
     //parse options
     int index;
     const char* profilefilename = "";
+    const char* exiffilename = NULL;
     bool embedOriginal = false;
 
     for (index = 1; index < argc && argv [index][0] == '-'; index++)
@@ -94,6 +96,11 @@ int main(int argc, const char* argv [])
         if (0 == strcmp(option.c_str(), "e"))
         {
             embedOriginal = true;
+        }
+        
+        if (0 == strcmp(option.c_str(), "x"))
+        {
+            exiffilename = argv[++index];
         }
     }
 
@@ -294,7 +301,10 @@ int main(int argc, const char* argv [])
     long     val;
     std::string str;
     Exiv2Helper meta;
-    if (meta.load(filename))
+    if (exiffilename == NULL)
+        // read exif from raw file
+        exiffilename = filename;
+    if (meta.load(exiffilename))
     {
         // Time from original shot
 
@@ -703,19 +713,19 @@ int main(int argc, const char* argv [])
         if (meta.getExifTagLong("Exif.NikonLd1.LensIDNumber", val))
         {
             char lensType[256];
-            snprintf(lensType, sizeof(lensType), "%i", val);
+            snprintf(lensType, sizeof(lensType), "%li", val);
             exif->fLensID.Set_ASCII(lensType);
         }
         if (meta.getExifTagLong("Exif.NikonLd2.LensIDNumber", val))
         {
             char lensType[256];
-            snprintf(lensType, sizeof(lensType), "%i", val);
+            snprintf(lensType, sizeof(lensType), "%li", val);
             exif->fLensID.Set_ASCII(lensType);
         }
         if (meta.getExifTagLong("Exif.NikonLd3.LensIDNumber", val))
         {
             char lensType[256];
-            snprintf(lensType, sizeof(lensType), "%i", val);
+            snprintf(lensType, sizeof(lensType), "%li", val);
             exif->fLensID.Set_ASCII(lensType);
         }
         if (meta.getExifTagLong("Exif.NikonLd2.FocusDistance", val))
@@ -749,7 +759,7 @@ int main(int argc, const char* argv [])
         if (meta.getExifTagLong("Exif.Canon.SerialNumber", val))
         {
             char serialNumber[256];
-            snprintf(serialNumber, sizeof(serialNumber), "%i", val);
+            snprintf(serialNumber, sizeof(serialNumber), "%li", val);
             exif->fCameraSerialNumber.Set_ASCII(serialNumber);
             exif->fCameraSerialNumber.TrimLeadingBlanks();
             exif->fCameraSerialNumber.TrimTrailingBlanks();
@@ -817,7 +827,7 @@ int main(int argc, const char* argv [])
                 (canonLensType != 65535))
         {
             char lensType[256];
-            snprintf(lensType, sizeof(lensType), "%i", canonLensType);
+            snprintf(lensType, sizeof(lensType), "%li", canonLensType);
             exif->fLensID.Set_ASCII(lensType);
         }
         str = meta.getExifTagString("Exif.Canon.LensModel");
@@ -861,7 +871,7 @@ int main(int argc, const char* argv [])
         str = meta.getExifTagString("Exif.CanonSi.ISOSpeed");
         if (str.length())
         {
-            sscanf(str.c_str(), "%d", &val);
+            sscanf(str.c_str(), "%ld", &val);
             exif->fISOSpeedRatings[0] = val;
         }
 
@@ -886,7 +896,7 @@ int main(int argc, const char* argv [])
                 (meta.getExifTagLong("Exif.Pentax.LensType", pentaxLensId2, 1)))
         {
             char lensType[256];
-            snprintf(lensType, sizeof(lensType), "%i %i", pentaxLensId1, pentaxLensId2);
+            snprintf(lensType, sizeof(lensType), "%li %li", pentaxLensId1, pentaxLensId2);
             exif->fLensID.Set_ASCII(lensType);
         }
 
@@ -945,7 +955,7 @@ int main(int argc, const char* argv [])
         if (meta.getExifTagLong("Exif.Sony2.LensID", val))
         {
             char lensType[256];
-            snprintf(lensType, sizeof(lensType), "%i", val);
+            snprintf(lensType, sizeof(lensType), "%li", val);
             exif->fLensID.Set_ASCII(lensType);
         }
 
@@ -1170,11 +1180,15 @@ int main(int argc, const char* argv [])
     // -----------------------------------------------------------------------------------------
 
     dng_image_writer writer;
-    char* lpszOutFileName = new char[255];
-    strcpy(lpszOutFileName, filename);
-    strcat(lpszOutFileName, ".dng");
-    dng_file_stream filestream(lpszOutFileName, true);
-    delete lpszOutFileName;
+
+    // output filename: replace raw file extension with .dng
+    std::string lpszOutFileName(filename);
+    found = lpszOutFileName.find_last_of(".");
+    if(found != std::string::npos)
+       lpszOutFileName.resize(found);
+    lpszOutFileName.append(".dng");
+
+    dng_file_stream filestream(lpszOutFileName.c_str(), true);
 
     writer.WriteDNG(host, filestream, *negative.Get(), thumbnail, ccJPEG, &previewList);
 
