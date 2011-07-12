@@ -29,86 +29,86 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
       m_Buffer(),
       m_Allocator(allocator)
 {
-    AutoPtr<LibRaw> fRawProcessor(new LibRaw());
+    AutoPtr<LibRaw> rawProcessor(new LibRaw());
 
-    int ret = fRawProcessor->open_file(filename);
+    int ret = rawProcessor->open_file(filename);
     if (ret != LIBRAW_SUCCESS)
     {
         printf("Cannot open %s: %s\n", filename, libraw_strerror(ret));
-        fRawProcessor->recycle();
+        rawProcessor->recycle();
         return;
     }
 
-    ret = fRawProcessor->adjust_sizes_info_only();
+    ret = rawProcessor->adjust_sizes_info_only();
     if (ret != LIBRAW_SUCCESS)
     {
         printf("LibRaw: failed to run adjust_sizes_info_only: %s", libraw_strerror(ret));
-        fRawProcessor->recycle();
+        rawProcessor->recycle();
         return;
     }
 
-    if ((fRawProcessor->imgdata.sizes.flip == 5) || (fRawProcessor->imgdata.sizes.flip == 6))
+    if ((rawProcessor->imgdata.sizes.flip == 5) || (rawProcessor->imgdata.sizes.flip == 6))
     {
-        m_FinalSize = dng_rect(fRawProcessor->imgdata.sizes.iwidth, fRawProcessor->imgdata.sizes.iheight);
+        m_FinalSize = dng_rect(rawProcessor->imgdata.sizes.iwidth, rawProcessor->imgdata.sizes.iheight);
     }
     else
     {
-        m_FinalSize = dng_rect(fRawProcessor->imgdata.sizes.iheight, fRawProcessor->imgdata.sizes.iwidth);
+        m_FinalSize = dng_rect(rawProcessor->imgdata.sizes.iheight, rawProcessor->imgdata.sizes.iwidth);
     }
 
-    fRawProcessor->recycle();
+    rawProcessor->recycle();
 
-    ret = fRawProcessor->open_file(filename);
+    ret = rawProcessor->open_file(filename);
     if (ret != LIBRAW_SUCCESS)
     {
         printf("Cannot open %s: %s\n", filename, libraw_strerror(ret));
-        fRawProcessor->recycle();
+        rawProcessor->recycle();
         return;
     }
 
-    fRawProcessor->imgdata.params.output_bps = 16;
-    fRawProcessor->imgdata.params.document_mode = 2;
-    fRawProcessor->imgdata.params.shot_select = 0;
+    rawProcessor->imgdata.params.output_bps = 16;
+    rawProcessor->imgdata.params.document_mode = 2;
+    rawProcessor->imgdata.params.shot_select = 0;
 
-    ret = fRawProcessor->unpack();
+    ret = rawProcessor->unpack();
     if (ret != LIBRAW_SUCCESS)
     {
         printf("LibRaw: failed to run unpack: %s", libraw_strerror(ret));
-        fRawProcessor->recycle();
+        rawProcessor->recycle();
         return;
     }
 
-    if (0 == strcmp(fRawProcessor->imgdata.idata.make, "Canon") && (fRawProcessor->imgdata.idata.filters != 0))
+    if (0 == strcmp(rawProcessor->imgdata.idata.make, "Canon") && (rawProcessor->imgdata.idata.filters != 0))
     {
-        ret = fRawProcessor->add_masked_borders_to_bitmap();
+        ret = rawProcessor->add_masked_borders_to_bitmap();
         if (ret != LIBRAW_SUCCESS)
         {
             printf("LibRaw: failed to run add_masked_borders_to_bitmap: %s", libraw_strerror(ret));
-            fRawProcessor->recycle();
+            rawProcessor->recycle();
             return;
         }
 
-        m_ActiveArea = dng_rect(fRawProcessor->imgdata.sizes.top_margin,
-                                fRawProcessor->imgdata.sizes.left_margin,
-                                fRawProcessor->imgdata.sizes.iheight - m_Imgdata.sizes.bottom_margin,
-                                fRawProcessor->imgdata.sizes.iwidth - m_Imgdata.sizes.right_margin);
+        m_ActiveArea = dng_rect(rawProcessor->imgdata.sizes.top_margin,
+                                rawProcessor->imgdata.sizes.left_margin,
+                                rawProcessor->imgdata.sizes.iheight - m_Imgdata.sizes.bottom_margin,
+                                rawProcessor->imgdata.sizes.iwidth - m_Imgdata.sizes.right_margin);
     }
     else
     {
-        m_ActiveArea = dng_rect(fRawProcessor->imgdata.sizes.iheight,
-                                fRawProcessor->imgdata.sizes.iwidth);
+        m_ActiveArea = dng_rect(rawProcessor->imgdata.sizes.iheight,
+                                rawProcessor->imgdata.sizes.iwidth);
     }
 
-    m_Imgdata = fRawProcessor->imgdata;
+    m_Imgdata = rawProcessor->imgdata;
 
     bool fujiRotate90 = false;
     if ((0 == memcmp("FUJIFILM", m_Imgdata.idata.make, std::min((size_t)8, sizeof(m_Imgdata.idata.make)))) &&
-            (2 == fRawProcessor->COLOR(0, 1)) &&
-            (1 == fRawProcessor->COLOR(1, 0)))
+            (2 == rawProcessor->COLOR(0, 1)) &&
+            (1 == rawProcessor->COLOR(1, 0)))
     {
         fujiRotate90 = true;
-        m_Imgdata.sizes.iheight = fRawProcessor->imgdata.sizes.iwidth;
-        m_Imgdata.sizes.iwidth = fRawProcessor->imgdata.sizes.iheight;
+        m_Imgdata.sizes.iheight = rawProcessor->imgdata.sizes.iwidth;
+        m_Imgdata.sizes.iwidth = rawProcessor->imgdata.sizes.iheight;
         m_Imgdata.sizes.flip = 6;
     }
 
@@ -130,17 +130,17 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
     m_Buffer.fPixelSize  = pixelSize;
     m_Buffer.fData       = m_Memory->Buffer();
 
-    if (fRawProcessor->imgdata.idata.filters == 0)
+    if (rawProcessor->imgdata.idata.filters == 0)
     {
         unsigned short* output = (unsigned short*)m_Buffer.fData;
 
-        for (unsigned int row = 0; row < fRawProcessor->imgdata.sizes.iheight; row++)
+        for (unsigned int row = 0; row < rawProcessor->imgdata.sizes.iheight; row++)
         {
-            for (unsigned int col = 0; col < fRawProcessor->imgdata.sizes.iwidth; col++)
+            for (unsigned int col = 0; col < rawProcessor->imgdata.sizes.iwidth; col++)
             {
-                for (int color = 0; color < fRawProcessor->imgdata.idata.colors; color++)
+                for (int color = 0; color < rawProcessor->imgdata.idata.colors; color++)
                 {
-                    *output = fRawProcessor->imgdata.image[row * fRawProcessor->imgdata.sizes.iwidth + col][color];
+                    *output = rawProcessor->imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][color];
                     *output++;
                 }
             }
@@ -148,29 +148,29 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
     }
     else
     {
-        if (!fRawProcessor->imgdata.idata.cdesc[3])
-            fRawProcessor->imgdata.idata.cdesc[3] = 'G';
+        if (!rawProcessor->imgdata.idata.cdesc[3])
+            rawProcessor->imgdata.idata.cdesc[3] = 'G';
 
         unsigned short* output = (unsigned short*)m_Buffer.fData;
 
         if (fujiRotate90 == false)
         {
-            for (unsigned int row = 0; row < fRawProcessor->imgdata.sizes.iheight; row++)
+            for (unsigned int row = 0; row < rawProcessor->imgdata.sizes.iheight; row++)
             {
-                for (unsigned int col = 0; col < fRawProcessor->imgdata.sizes.iwidth; col++)
+                for (unsigned int col = 0; col < rawProcessor->imgdata.sizes.iwidth; col++)
                 {
-                    *output = m_Imgdata.image[row * fRawProcessor->imgdata.sizes.iwidth + col][fRawProcessor->COLOR(row, col)];
+                    *output = m_Imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][rawProcessor->COLOR(row, col)];
                     *output++;
                 }
             }
         }
         else
         {
-            for (unsigned int col = 0; col < fRawProcessor->imgdata.sizes.iwidth; col++)
+            for (unsigned int col = 0; col < rawProcessor->imgdata.sizes.iwidth; col++)
             {
-                for (unsigned int row = 0; row < fRawProcessor->imgdata.sizes.iheight; row++)
+                for (unsigned int row = 0; row < rawProcessor->imgdata.sizes.iheight; row++)
                 {
-                    *output = fRawProcessor->imgdata.image[row * fRawProcessor->imgdata.sizes.iwidth + col][fRawProcessor->COLOR(row, col)];
+                    *output = rawProcessor->imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][rawProcessor->COLOR(row, col)];
                     *output++;
                 }
             }
@@ -247,7 +247,7 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
     }
     }
 
-    fRawProcessor->recycle();
+    rawProcessor->recycle();
 }
 
 LibRawImage::LibRawImage(const dng_rect &bounds,

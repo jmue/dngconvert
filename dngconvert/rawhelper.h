@@ -36,8 +36,4 @@ public:
     ~RawHelper(void);
 
     int identifyRawData(const char* fname, libraw_data_t* imgdata);
-    int extractRawData(const char* fname, unsigned int shot, libraw_data_t* imgdata, std::vector<unsigned short>* rawdata, bool fullSensorImage = false);
-
-private:
-    LibRaw* m_RawProcessor;
 };
