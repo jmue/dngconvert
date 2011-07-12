@@ -59,6 +59,12 @@
 #include "dnghost.h"
 #include "dngimagewriter.h"
 
+#if qWinOS
+	#ifndef snprintf
+		#define snprintf _snprintf
+	#endif
+#endif
+
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
 int main(int argc, const char* argv [])
