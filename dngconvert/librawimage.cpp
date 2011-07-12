@@ -99,21 +99,21 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
                                 rawProcessor->imgdata.sizes.iwidth);
     }
 
-    m_Imgdata = rawProcessor->imgdata;
+    libraw_data_t imgdata = rawProcessor->imgdata;
 
     bool fujiRotate90 = false;
-    if ((0 == memcmp("FUJIFILM", m_Imgdata.idata.make, std::min((size_t)8, sizeof(m_Imgdata.idata.make)))) &&
+    if ((0 == memcmp("FUJIFILM", imgdata.idata.make, std::min((size_t)8, sizeof(imgdata.idata.make)))) &&
             (2 == rawProcessor->COLOR(0, 1)) &&
             (1 == rawProcessor->COLOR(1, 0)))
     {
         fujiRotate90 = true;
-        m_Imgdata.sizes.iheight = rawProcessor->imgdata.sizes.iwidth;
-        m_Imgdata.sizes.iwidth = rawProcessor->imgdata.sizes.iheight;
-        m_Imgdata.sizes.flip = 6;
+        imgdata.sizes.iheight = rawProcessor->imgdata.sizes.iwidth;
+        imgdata.sizes.iwidth = rawProcessor->imgdata.sizes.iheight;
+        imgdata.sizes.flip = 6;
     }
 
-    fBounds = dng_rect(m_Imgdata.sizes.iheight, m_Imgdata.sizes.iwidth);
-    fPlanes = (m_Imgdata.idata.filters == 0) ? 3 : 1;
+    fBounds = dng_rect(imgdata.sizes.iheight, imgdata.sizes.iwidth);
+    fPlanes = (imgdata.idata.filters == 0) ? 3 : 1;
     uint32 pixelType = ttShort;
     uint32 pixelSize = TagTypeSize(pixelType);
     uint32 bytes = fBounds.H() * fBounds.W() * fPlanes * pixelSize;
@@ -159,7 +159,7 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
             {
                 for (unsigned int col = 0; col < rawProcessor->imgdata.sizes.iwidth; col++)
                 {
-                    *output = m_Imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][rawProcessor->COLOR(row, col)];
+                    *output = rawProcessor->imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][rawProcessor->COLOR(row, col)];
                     *output++;
                 }
             }
@@ -177,39 +177,39 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
         }
     }
 
-    m_CameraNeutral = dng_vector(m_Imgdata.idata.colors);
-    for (int i = 0; i < m_Imgdata.idata.colors; i++)
+    m_CameraNeutral = dng_vector(rawProcessor->imgdata.idata.colors);
+    for (int i = 0; i < rawProcessor->imgdata.idata.colors; i++)
     {
-        m_CameraNeutral[i] = 1.0 / m_Imgdata.color.cam_mul[i];
+        m_CameraNeutral[i] = 1.0 / rawProcessor->imgdata.color.cam_mul[i];
     }
 
-    m_MakeName.Set_ASCII(m_Imgdata.idata.make);
-    m_ModelName.Set_ASCII(m_Imgdata.idata.model);
+    m_MakeName.Set_ASCII(rawProcessor->imgdata.idata.make);
+    m_ModelName.Set_ASCII(rawProcessor->imgdata.idata.model);
 
-    m_Channels = m_Imgdata.idata.colors;
+    m_Channels = rawProcessor->imgdata.idata.colors;
 
     m_BlackLevel = dng_vector(4);
     m_WhiteLevel = dng_vector(4);
     for (int i = 0; i < 4; i++)
     {
-        m_BlackLevel[i] = m_Imgdata.color.black + m_Imgdata.color.cblack[i];
-        m_WhiteLevel[i] = m_Imgdata.color.maximum;
+        m_BlackLevel[i] = rawProcessor->imgdata.color.black + rawProcessor->imgdata.color.cblack[i];
+        m_WhiteLevel[i] = rawProcessor->imgdata.color.maximum;
     }
 
-    switch (m_Imgdata.idata.colors)
+    switch (rawProcessor->imgdata.idata.colors)
     {
     case 3:
     {
         dng_matrix_3by3 camXYZ;
-        camXYZ[0][0] = m_Imgdata.color.cam_xyz[0][0];
-        camXYZ[0][1] = m_Imgdata.color.cam_xyz[0][1];
-        camXYZ[0][2] = m_Imgdata.color.cam_xyz[0][2];
-        camXYZ[1][0] = m_Imgdata.color.cam_xyz[1][0];
-        camXYZ[1][1] = m_Imgdata.color.cam_xyz[1][1];
-        camXYZ[1][2] = m_Imgdata.color.cam_xyz[1][2];
-        camXYZ[2][0] = m_Imgdata.color.cam_xyz[2][0];
-        camXYZ[2][1] = m_Imgdata.color.cam_xyz[2][1];
-        camXYZ[2][2] = m_Imgdata.color.cam_xyz[2][2];
+        camXYZ[0][0] = rawProcessor->imgdata.color.cam_xyz[0][0];
+        camXYZ[0][1] = rawProcessor->imgdata.color.cam_xyz[0][1];
+        camXYZ[0][2] = rawProcessor->imgdata.color.cam_xyz[0][2];
+        camXYZ[1][0] = rawProcessor->imgdata.color.cam_xyz[1][0];
+        camXYZ[1][1] = rawProcessor->imgdata.color.cam_xyz[1][1];
+        camXYZ[1][2] = rawProcessor->imgdata.color.cam_xyz[1][2];
+        camXYZ[2][0] = rawProcessor->imgdata.color.cam_xyz[2][0];
+        camXYZ[2][1] = rawProcessor->imgdata.color.cam_xyz[2][1];
+        camXYZ[2][2] = rawProcessor->imgdata.color.cam_xyz[2][2];
         if (camXYZ.MaxEntry() == 0.0)
         {
             printf("Warning, camera XYZ Matrix is null");
@@ -223,18 +223,18 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
     case 4:
     {
         dng_matrix_4by3 camXYZ;
-        camXYZ[0][0] = m_Imgdata.color.cam_xyz[0][0];
-        camXYZ[0][1] = m_Imgdata.color.cam_xyz[0][1];
-        camXYZ[0][2] = m_Imgdata.color.cam_xyz[0][2];
-        camXYZ[1][0] = m_Imgdata.color.cam_xyz[1][0];
-        camXYZ[1][1] = m_Imgdata.color.cam_xyz[1][1];
-        camXYZ[1][2] = m_Imgdata.color.cam_xyz[1][2];
-        camXYZ[2][0] = m_Imgdata.color.cam_xyz[2][0];
-        camXYZ[2][1] = m_Imgdata.color.cam_xyz[2][1];
-        camXYZ[2][2] = m_Imgdata.color.cam_xyz[2][2];
-        camXYZ[3][0] = m_Imgdata.color.cam_xyz[3][0];
-        camXYZ[3][1] = m_Imgdata.color.cam_xyz[3][1];
-        camXYZ[3][2] = m_Imgdata.color.cam_xyz[3][2];
+        camXYZ[0][0] = rawProcessor->imgdata.color.cam_xyz[0][0];
+        camXYZ[0][1] = rawProcessor->imgdata.color.cam_xyz[0][1];
+        camXYZ[0][2] = rawProcessor->imgdata.color.cam_xyz[0][2];
+        camXYZ[1][0] = rawProcessor->imgdata.color.cam_xyz[1][0];
+        camXYZ[1][1] = rawProcessor->imgdata.color.cam_xyz[1][1];
+        camXYZ[1][2] = rawProcessor->imgdata.color.cam_xyz[1][2];
+        camXYZ[2][0] = rawProcessor->imgdata.color.cam_xyz[2][0];
+        camXYZ[2][1] = rawProcessor->imgdata.color.cam_xyz[2][1];
+        camXYZ[2][2] = rawProcessor->imgdata.color.cam_xyz[2][2];
+        camXYZ[3][0] = rawProcessor->imgdata.color.cam_xyz[3][0];
+        camXYZ[3][1] = rawProcessor->imgdata.color.cam_xyz[3][1];
+        camXYZ[3][2] = rawProcessor->imgdata.color.cam_xyz[3][2];
         if (camXYZ.MaxEntry() == 0.0)
         {
             printf("Warning, camera XYZ Matrix is null");

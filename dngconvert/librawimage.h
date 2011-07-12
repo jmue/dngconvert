@@ -56,7 +56,6 @@ protected:
     dng_pixel_buffer m_Buffer;
     AutoPtr<dng_memory_block> m_Memory;
     dng_memory_allocator &m_Allocator;
-    libraw_data_t m_Imgdata;
     dng_vector m_CameraNeutral;
     dng_string m_ModelName;
     dng_string m_MakeName;
