@@ -80,7 +80,7 @@ int main(int argc, const char* argv [])
                 "  -d <filename>     include dead pixel list\n"
                 "  -e                embed original\n"
                 "  -p <filename>     use adobe camera profile\n"
-                "  -x <filename>     read EXIF from this file\n",
+                "  -x <filename>|-   read EXIF from this file, - to disable\n",
                 argv[0]);
 
         return -1;
