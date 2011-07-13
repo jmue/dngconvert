@@ -86,13 +86,19 @@ int main(int argc, const char* argv [])
 
     //parse options
     int index;
-    const char* profilefilename = "";
+    const char* outfilename = NULL;
+    const char* profilefilename = NULL;
     const char* exiffilename = NULL;
     bool embedOriginal = false;
 
     for (index = 1; index < argc && argv [index][0] == '-'; index++)
     {
         std::string option = &argv[index][1];
+
+        if (0 == strcmp(option.c_str(), "o"))
+        {
+            outfilename = argv[++index];
+        }
 
         if (0 == strcmp(option.c_str(), "p"))
         {
@@ -274,7 +280,7 @@ int main(int argc, const char* argv [])
     // -------------------------------------------------------------------------------
 
     AutoPtr<dng_camera_profile> prof(new dng_camera_profile);
-    if (0 != strcmp(profilefilename, ""))
+    if (profilefilename != NULL)
     {
         dng_file_stream profStream(profilefilename);
         prof->ParseExtended(profStream);
@@ -310,7 +316,8 @@ int main(int argc, const char* argv [])
     if (exiffilename == NULL)
         // read exif from raw file
         exiffilename = filename;
-    if (meta.load(exiffilename))
+    // '-x -' disables exif reading
+    if (strcmp(exiffilename, "-") != 0 && meta.load(exiffilename))
     {
         // Time from original shot
 
@@ -1189,6 +1196,8 @@ int main(int argc, const char* argv [])
 
     // output filename: replace raw file extension with .dng
     std::string lpszOutFileName(filename);
+    if (outfilename != NULL)
+        lpszOutFileName.assign(outfilename);
     found = lpszOutFileName.find_last_of(".");
     if(found != std::string::npos)
        lpszOutFileName.resize(found);
