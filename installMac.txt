@@ -1,0 +1,44 @@
+Install instructions for MacOSX
+
+
+A. Prerequisites
+
+1. Install MacPorts (http://www.macports.org/install.php)
+
+2. Install Libjpeg and Exiv2 library via MacPorts:
+
+ port install exiv2 jpeg
+
+
+B. Build LibRaw
+
+1. Download and extract LibRAW (http://www.libraw.org/)
+   Note: You don't need LibRAW demosaic packs
+
+2. Configure and build LibRAW (installing the library is optional):
+
+ ./configure --disable-lcms --disable-shared
+ make
+
+3. Set path to static library:
+
+ LIBRAW_PATH=${PWD}
+
+
+C. Building dngconvert
+
+1. In the dngconvert directory create a build subdir and run cmake:
+
+ mkdir build
+ cd build
+ CXXFLAGS="-O2" CMAKE_INCLUDE_PATH=$LIBRAW_PATH \
+ CMAKE_LIBRARY_PATH=${LIBRAW_PATH}/lib cmake ..
+
+2. If cmake complains it cannot find libexiv2 or libjpeg add
+   /opt/local/include to CMAKE_INCLUDE_PATH and /opt/local/lib to
+   CMAKE_LIBRARY_PATH
+
+3. Then compile dngconvert:
+
+ make
+
