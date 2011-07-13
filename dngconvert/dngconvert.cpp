@@ -26,6 +26,7 @@
 #include "string.h"
 #include "assert.h"
 
+#include "dng_bad_pixels.h"
 #include "dng_camera_profile.h"
 #include "dng_color_space.h"
 #include "dng_exceptions.h"
@@ -76,8 +77,9 @@ int main(int argc, const char* argv [])
                 "dngconvert - DNG convertion tool\n"
                 "Usage: %s [options] <dngfile>\n"
                 "Valid options:\n"
+                "  -d <filename>     include dead pixel list\n"
                 "  -e                embed original\n"
-                "  -p <filename>     use camera profile\n"
+                "  -p <filename>     use adobe camera profile\n"
                 "  -x <filename>     read EXIF from this file\n",
                 argv[0]);
 
@@ -86,6 +88,7 @@ int main(int argc, const char* argv [])
 
     //parse options
     int index;
+    const char* deadpixelfilename = NULL;
     const char* outfilename = NULL;
     const char* profilefilename = NULL;
     const char* exiffilename = NULL;
@@ -98,6 +101,11 @@ int main(int argc, const char* argv [])
         if (0 == strcmp(option.c_str(), "o"))
         {
             outfilename = argv[++index];
+        }
+
+        if (0 == strcmp(option.c_str(), "d"))
+        {
+            deadpixelfilename = argv[++index];
         }
 
         if (0 == strcmp(option.c_str(), "p"))
@@ -198,6 +206,7 @@ int main(int argc, const char* argv [])
 
     negative->SetColorKeys(colorCodes[0], colorCodes[1], colorCodes[2], colorCodes[3]);
 
+    uint32 bayerPhase = 0xFFFFFFFF;
     if (rawImage->Channels() == 4)
     {
         negative->SetQuadMosaic(imgdata.idata.filters);
@@ -208,24 +217,23 @@ int main(int argc, const char* argv [])
     }
     else
     {
-        uint32 bayerMosaic = 0xFFFFFFFF;
         switch(imgdata.idata.filters)
         {
         case 0xe1e1e1e1:
-            bayerMosaic = 0;
+            bayerPhase = 0;
             break;
         case 0xb4b4b4b4:
-            bayerMosaic = 1;
+            bayerPhase = 1;
             break;
         case 0x1e1e1e1e:
-            bayerMosaic = 2;
+            bayerPhase = 2;
             break;
         case 0x4b4b4b4b:
-            bayerMosaic = 3;
+            bayerPhase = 3;
             break;
         }
-        if (bayerMosaic != 0xFFFFFFFF)
-            negative->SetBayerMosaic(bayerMosaic);
+        if (bayerPhase != 0xFFFFFFFF)
+            negative->SetBayerMosaic(bayerPhase);
     }
 
     negative->SetWhiteLevel(rawImage->WhiteLevel(0), 0);
@@ -302,6 +310,53 @@ int main(int argc, const char* argv [])
     negative->AddProfile(prof);
 
     negative->SetCameraNeutral(rawImage->CameraNeutral());
+
+    // -----------------------------------------------------------------------------------------
+
+    if (deadpixelfilename != NULL)
+    {
+        if (bayerPhase != 0xFFFFFFFF)
+        {
+            AutoPtr<dng_bad_pixel_list> badPixelList(new dng_bad_pixel_list());
+
+            char*cp, line[128];
+            int time, row, col;
+            FILE *fp = fopen(deadpixelfilename, "r");
+            if (fp)
+            {
+                while (fgets (line, 128, fp))
+                {
+                    cp = strchr(line, '#');
+                    if (cp)
+                        *cp = 0;
+                    if (sscanf (line, "%d %d %d", &col, &row, &time) != 3)
+                        continue;
+                    col += rawImage->ActiveArea().l;
+                    row += rawImage->ActiveArea().t;
+                    if ((unsigned) col >= image->Width() || (unsigned) row >= image->Height())
+                        continue;
+                    //currently ignore timestamp
+                    //if (time > timestamp)
+                    //    continue;
+                    badPixelList->AddPoint(dng_point(col, row));
+                }
+                fclose(fp);
+            }
+            else
+            {
+                fprintf (stderr, "could not read dead pixel file\n");
+                return 1;
+            }
+
+            AutoPtr<dng_opcode> badPixelOpcode(new dng_opcode_FixBadPixelsList(badPixelList, bayerPhase));
+            negative->OpcodeList1().Append(badPixelOpcode);
+        }
+        else
+        {
+            fprintf (stderr, "dead pixel lists are only applyable to bayer images\n");
+            return 1;
+        }
+    }
 
     // -----------------------------------------------------------------------------------------
 
