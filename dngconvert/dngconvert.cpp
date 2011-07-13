@@ -1197,11 +1197,16 @@ int main(int argc, const char* argv [])
     // output filename: replace raw file extension with .dng
     std::string lpszOutFileName(filename);
     if (outfilename != NULL)
+    {
         lpszOutFileName.assign(outfilename);
-    found = lpszOutFileName.find_last_of(".");
-    if(found != std::string::npos)
-       lpszOutFileName.resize(found);
-    lpszOutFileName.append(".dng");
+    }
+    else
+    {
+        found = lpszOutFileName.find_last_of(".");
+        if(found != std::string::npos)
+            lpszOutFileName.resize(found);
+        lpszOutFileName.append(".dng");
+    }
 
     dng_file_stream filestream(lpszOutFileName.c_str(), true);
 
