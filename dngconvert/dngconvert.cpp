@@ -334,7 +334,7 @@ int main(int argc, const char* argv [])
                     //currently ignore timestamp
                     //if (time > timestamp)
                     //    continue;
-                    badPixelList->AddPoint(dng_point(col, row));
+                    badPixelList->AddPoint(dng_point(row, col));
                 }
                 fclose(fp);
             }
