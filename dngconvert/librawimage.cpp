@@ -18,8 +18,10 @@
 */
 
 #include "librawimage.h"
+#include "librawdngdatastream.h"
 
 #include "dng_memory.h"
+#include "dng_file_stream.h"
 
 #include "libraw/libraw.h"
 
@@ -29,12 +31,28 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
       m_Buffer(),
       m_Allocator(allocator)
 {
+    dng_file_stream stream(filename);
+    Parse(stream);
+}
+
+LibRawImage::LibRawImage(dng_stream &stream, dng_memory_allocator &allocator)
+    :	dng_image(dng_rect(0, 0), 0, ttShort),
+      m_Memory(),
+      m_Buffer(),
+      m_Allocator(allocator)
+{
+    Parse(stream);
+}
+
+void LibRawImage::Parse(dng_stream &stream)
+{
+    AutoPtr<LibRawDngDataStream> rawStream(new LibRawDngDataStream(stream));
     AutoPtr<LibRaw> rawProcessor(new LibRaw());
 
-    int ret = rawProcessor->open_file(filename);
+    int ret = rawProcessor->open_datastream(rawStream.Get());
     if (ret != LIBRAW_SUCCESS)
     {
-        printf("Cannot open %s: %s\n", filename, libraw_strerror(ret));
+        printf("Cannot open stream: %s\n", libraw_strerror(ret));
         rawProcessor->recycle();
         return;
     }
@@ -58,10 +76,11 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
 
     rawProcessor->recycle();
 
-    ret = rawProcessor->open_file(filename);
+    rawStream.Get()->seek(0, SEEK_SET);
+    ret = rawProcessor->open_datastream(rawStream.Get());
     if (ret != LIBRAW_SUCCESS)
     {
-        printf("Cannot open %s: %s\n", filename, libraw_strerror(ret));
+        printf("Cannot open stream: %s\n", libraw_strerror(ret));
         rawProcessor->recycle();
         return;
     }

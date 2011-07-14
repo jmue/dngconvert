@@ -24,6 +24,7 @@
 #include "dng_pixel_buffer.h"
 #include "dng_matrix.h"
 #include "dng_string.h"
+#include "dng_stream.h"
 
 #include "libraw/libraw_types.h"
 
@@ -32,6 +33,7 @@ class LibRawImage :
 {
 public:
     LibRawImage(const char *filename, dng_memory_allocator &allocator);
+    LibRawImage(dng_stream &stream, dng_memory_allocator &allocator);
     LibRawImage(const dng_rect &bounds, uint32 planes, uint32 pixelType, dng_memory_allocator &allocator);
     ~LibRawImage(void);
 
@@ -49,6 +51,9 @@ public:
 
 protected:
     virtual void AcquireTileBuffer(dng_tile_buffer &buffer, const dng_rect &area,	bool dirty) const;
+
+private:
+    void Parse(dng_stream &stream);
 
 protected:
     dng_rect m_ActiveArea;

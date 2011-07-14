@@ -61,7 +61,9 @@ ENDIF(NOT WIN32)
 SET( DNGCONVERT_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/dngconvert.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/exiv2helper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/exiv2dngstreamio.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/librawimage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/librawdngdatastream.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rawhelper.cpp
    )
 
