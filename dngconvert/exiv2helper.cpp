@@ -20,6 +20,10 @@
 #include "exiv2helper.h"
 #include "stdio.h"
 
+#include "exiv2dngstreamio.h"
+
+#include "dng_file_stream.h"
+
 Exiv2Helper::Exiv2Helper(void)
 {
 }
@@ -36,18 +40,21 @@ void Exiv2Helper::printExiv2ExceptionError(const char* msg, Exiv2::Error& e)
 
 bool Exiv2Helper::load(const char* filePath)
 {
-    if (NULL == filePath)
-        return false;
+    dng_file_stream fileStream(filePath);
+    return load(fileStream);
+}
 
+bool Exiv2Helper::load(dng_stream &stream)
+{
     try
     {
-        Exiv2::Image::AutoPtr image;
+        Exiv2::BasicIo::AutoPtr exiv2Stream(new Exiv2DngStreamIO(stream));
 
-        image = Exiv2::ImageFactory::open(filePath);
+        Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(exiv2Stream);
 
         if (!image.get())
         {
-            fprintf(stderr, "File '%s' is not readable.", filePath);
+            fprintf(stderr, "stream is not readable.");
             return false;
         }
 

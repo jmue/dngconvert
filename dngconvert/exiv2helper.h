@@ -22,6 +22,8 @@
 #include <exiv2/exif.hpp>
 #include <exiv2/image.hpp>
 
+#include <dng_stream.h>
+
 class Exiv2Helper
 {
 public:
@@ -29,6 +31,7 @@ public:
     ~Exiv2Helper(void);
 
     bool load(const char* fname);
+    bool load(dng_stream &stream);
 
     std::string getExifTagString(const char* exifTagName) const;
     bool getExifTagRational(const char* exifTagName, long int& num, long int& den, int component=0) const;
