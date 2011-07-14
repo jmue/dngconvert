@@ -60,12 +60,10 @@
 #include "dnghost.h"
 #include "dngimagewriter.h"
 
-#if qWinOS
-	#ifndef snprintf
-		#define snprintf _snprintf
-	#endif
+#ifdef WIN32
+#define snprintf _snprintf
+#include <windows.h>
 #endif
-
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
 int main(int argc, const char* argv [])
@@ -329,10 +327,8 @@ int main(int argc, const char* argv [])
                     cp = strchr(line, '#');
                     if (cp)
                         *cp = 0;
-                    if (sscanf (line, "%d %d %d", &col, &row, &time) != 3)
+                    if (sscanf (line, "%d %d %d", &col, &row, &time) < 2)
                         continue;
-                    col += rawImage->ActiveArea().l;
-                    row += rawImage->ActiveArea().t;
                     if ((unsigned) col >= image->Width() || (unsigned) row >= image->Height())
                         continue;
                     //currently ignore timestamp

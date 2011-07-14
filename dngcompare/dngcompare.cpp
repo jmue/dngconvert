@@ -15,11 +15,6 @@
    along with this library; see the file COPYING.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.
-   
-   This file uses code from dngwriter.cpp -- KDE Kipi-plugins dngconverter utility 
-   (https://projects.kde.org/projects/extragear/graphics/kipi-plugins) utility,
-   dngwriter.cpp is Copyright 2008-2010 by Gilles Caulier <caulier dot gilles at gmail dot com> 
-   and Jens Mueller <tschenser at gmx dot de>
 */
 
 #include "dng_file_stream.h"
