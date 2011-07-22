@@ -25,6 +25,11 @@
 #include <exiv2/exif.hpp>
 #include <exiv2/image.hpp>
 
+#ifdef WIN32
+#define snprintf _snprintf
+#include <windows.h>
+#endif
+
 void printExiv2ExceptionError(const char* msg, Exiv2::Error& e)
 {
     std::string s(e.what());

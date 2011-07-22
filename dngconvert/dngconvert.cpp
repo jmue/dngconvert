@@ -22,6 +22,7 @@
    and Jens Mueller <tschenser at gmx dot de>
 */
 
+#include <stdio.h>
 #include <string>
 #include <assert.h>
 
@@ -58,11 +59,6 @@
 
 #include "dnghost.h"
 #include "dngimagewriter.h"
-
-#ifdef WIN32
-#define snprintf _snprintf
-#include <windows.h>
-#endif
 
 int main(int argc, const char* argv [])
 {
