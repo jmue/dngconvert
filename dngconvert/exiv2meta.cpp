@@ -551,34 +551,34 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
             }
 
             m_Exif->fLensName.Set_ASCII(lensName.c_str());
+        }
 
-            // XMP
+        // XMP
 
-            std::string xmpPacket;
-            if (0 == Exiv2::XmpParser::encode(xmpPacket, xmpData))
+        std::string xmpPacket;
+        if (0 != Exiv2::XmpParser::encode(xmpPacket, xmpData))
+        {
+            throw Exiv2::Error(1, "Failed to serialize XMP data");
+        }
+        Exiv2::XmpParser::terminate();
+
+        m_XMP.Reset(new dng_xmp(host.Allocator()));
+        m_XMP->Parse(host, xmpPacket.c_str(), xmpPacket.length());
+
+        // Makernotes
+
+        m_MakerNoteOffset = 0;
+        m_MakerNoteByteOrder.Set_ASCII("");
+        if (getExifTag(exifData, "Exif.MakerNote.Offset", 0, &m_MakerNoteOffset) &&
+                getExifTag(exifData, "Exif.MakerNote.ByteOrder", &m_MakerNoteByteOrder))
+        {
+            long bufsize = 0;
+            unsigned char* buffer = 0;
+            if (getExifTagData(exifData, "Exif.Photo.MakerNote", &bufsize, &buffer))
             {
-                throw Exiv2::Error(1, "Failed to serialize XMP data");
-            }
-            Exiv2::XmpParser::terminate();
-
-            m_XMP.Reset(new dng_xmp(host.Allocator()));
-            m_XMP->Parse(host, xmpPacket.c_str(), xmpPacket.length());
-
-            // Makernotes
-
-            m_MakerNoteOffset = 0;
-            m_MakerNoteByteOrder.Set_ASCII("");
-            if (getExifTag(exifData, "Exif.MakerNote.Offset", 0, &m_MakerNoteOffset) &&
-                    getExifTag(exifData, "Exif.MakerNote.ByteOrder", &m_MakerNoteByteOrder))
-            {
-                long bufsize = 0;
-                unsigned char* buffer = 0;
-                if (getExifTagData(exifData, "Exif.Photo.MakerNote", &bufsize, &buffer))
-                {
-                    m_MakerNote.Reset(host.Allocate(bufsize));
-                    memcpy(m_MakerNote->Buffer(), buffer, bufsize);
-                    delete[] buffer;
-                }
+                m_MakerNote.Reset(host.Allocate(bufsize));
+                memcpy(m_MakerNote->Buffer(), buffer, bufsize);
+                delete[] buffer;
             }
         }
     }
