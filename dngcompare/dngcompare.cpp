@@ -560,7 +560,7 @@ void compareNegative(const dng_negative& negative1, const dng_negative& negative
         printf("    ProfileCount: %d %d\n", negative1.ProfileCount(), negative2.ProfileCount());
     if (0 != memcmp(negative1.RawDataUniqueID().data, negative2.RawDataUniqueID().data, 16 * sizeof(uint8)))
         printf("    RawDataUniqueID\n");
-    if (0 != (negative1.RawImageDigest().data, negative2.RawImageDigest().data, 16 * sizeof(uint8)))
+    if (0 != memcmp(negative1.RawImageDigest().data, negative2.RawImageDigest().data, 16 * sizeof(uint8)))
         printf("    RawImageDigest\n");
     if (negative1.RawToFullScaleH() != negative2.RawToFullScaleH())
         printf("    RawToFullScaleH: %.3f %.3f\n", negative1.RawToFullScaleH(), negative2.RawToFullScaleH());
@@ -572,6 +572,22 @@ void compareNegative(const dng_negative& negative1, const dng_negative& negative
     //  printf("    SquareHeight: %.1f %.1f\n", negative1.SquareHeight(), negative2.SquareHeight());
     //if (negative1.SquareWidth() != negative2.SquareWidth())
     //  printf("    SquareWidth: %.1f %.1f\n", negative1.SquareWidth(), negative2.SquareWidth());
+
+    const dng_mosaic_info* mosaicInfo1 = negative1.GetMosaicInfo();
+    const dng_mosaic_info* mosaicInfo2 = negative2.GetMosaicInfo();
+
+    if (mosaicInfo1->fBayerGreenSplit != mosaicInfo2->fBayerGreenSplit)
+        printf("    BayerGreenSplit: %d %d\n", mosaicInfo1->fBayerGreenSplit, mosaicInfo2->fBayerGreenSplit);
+    if (mosaicInfo1->fCFALayout != mosaicInfo2->fCFALayout)
+        printf("    CFALayout: %d %d\n", mosaicInfo1->fCFALayout, mosaicInfo2->fCFALayout);
+    if (0 != memcmp(mosaicInfo1->fCFAPattern, mosaicInfo2->fCFAPattern, kMaxCFAPattern * kMaxCFAPattern * sizeof(uint8)))
+        printf("    CFAPattern\n");
+    if (mosaicInfo1->fCFAPatternSize != mosaicInfo2->fCFAPatternSize)
+        printf("    CFAPatternSize: %d,%d %d,%d\n", mosaicInfo1->fCFAPatternSize.h, mosaicInfo1->fCFAPatternSize.v, mosaicInfo2->fCFAPatternSize.h, mosaicInfo2->fCFAPatternSize.v);
+    if (0 != memcmp(mosaicInfo1->fCFAPlaneColor, mosaicInfo2->fCFAPlaneColor, kMaxColorPlanes * sizeof(uint8)))
+        printf("    CFAPlaneColor\n");
+    if (mosaicInfo1->fColorPlanes != mosaicInfo2->fColorPlanes)
+        printf("    ColorPlanes: %d %d\n", mosaicInfo1->fColorPlanes, mosaicInfo2->fColorPlanes);
 }
 
 int main(int argc, const char* argv [])
@@ -651,5 +667,4 @@ int main(int argc, const char* argv [])
 
     return 0;
 }
-
 
