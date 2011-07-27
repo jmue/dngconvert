@@ -23,8 +23,10 @@
 #include "dng_image.h"
 #include "dng_pixel_buffer.h"
 #include "dng_matrix.h"
+#include "dng_orientation.h"
 #include "dng_string.h"
 #include "dng_stream.h"
+#include "dng_tag_values.h"
 
 #include "libraw/libraw_types.h"
 
@@ -43,21 +45,28 @@ public:
     const dng_string& ModelName() const;
     const dng_string& MakeName() const;
     const dng_rect& ActiveArea() const;
-    const dng_rect& FinalSize() const;
     uint32 Channels() const;
     const dng_matrix& ColorMatrix() const;
     const real64 BlackLevel(uint32 channel) const;
     const real64 WhiteLevel(uint32 channel) const;
+    const dng_urational& DefaultScaleH() const;
+    const dng_urational& DefaultScaleV() const;
+    const dng_urational& DefaultCropSizeH() const;
+    const dng_urational& DefaultCropSizeV() const;
+    const dng_urational& DefaultCropOriginH() const;
+    const dng_urational& DefaultCropOriginV() const;
+    const dng_orientation Orientation() const;
+    uint32 Pattern() const;
+    ColorKeyCode ColorKey(uint32 plane) const;
 
 protected:
-    virtual void AcquireTileBuffer(dng_tile_buffer &buffer, const dng_rect &area,	bool dirty) const;
+    virtual void AcquireTileBuffer(dng_tile_buffer &buffer, const dng_rect &area, bool dirty) const;
 
 private:
     void Parse(dng_stream &stream);
 
 protected:
     dng_rect m_ActiveArea;
-    dng_rect m_FinalSize;
     dng_pixel_buffer m_Buffer;
     AutoPtr<dng_memory_block> m_Memory;
     dng_memory_allocator &m_Allocator;
@@ -68,4 +77,13 @@ protected:
     dng_matrix m_ColorMatrix;
     dng_vector m_WhiteLevel;
     dng_vector m_BlackLevel;
+    dng_urational m_DefaultScaleH;
+    dng_urational m_DefaultScaleV;
+    dng_urational m_DefaultCropSizeH;
+    dng_urational m_DefaultCropSizeV;
+    dng_urational m_DefaultCropOriginH;
+    dng_urational m_DefaultCropOriginV;
+    dng_orientation m_BaseOrientation;
+    uint32 m_Pattern;
+    ColorKeyCode m_CFAPlaneColor[4];
 };

@@ -20,8 +20,8 @@
 #include "librawimage.h"
 #include "librawdngdatastream.h"
 
-#include "dng_memory.h"
 #include "dng_file_stream.h"
+#include "dng_memory.h"
 
 #include "libraw/libraw.h"
 
@@ -65,13 +65,17 @@ void LibRawImage::Parse(dng_stream &stream)
         return;
     }
 
+    uint32 finalWidth = 0;
+    uint32 finalHeight = 0;
     if ((rawProcessor->imgdata.sizes.flip == 5) || (rawProcessor->imgdata.sizes.flip == 6))
     {
-        m_FinalSize = dng_rect(rawProcessor->imgdata.sizes.iwidth, rawProcessor->imgdata.sizes.iheight);
+        finalHeight = rawProcessor->imgdata.sizes.iwidth;
+        finalWidth = rawProcessor->imgdata.sizes.iheight;
     }
     else
     {
-        m_FinalSize = dng_rect(rawProcessor->imgdata.sizes.iheight, rawProcessor->imgdata.sizes.iwidth);
+        finalHeight = rawProcessor->imgdata.sizes.iheight;
+        finalWidth = rawProcessor->imgdata.sizes.iwidth;
     }
 
     rawProcessor->recycle();
@@ -110,26 +114,67 @@ void LibRawImage::Parse(dng_stream &stream)
         }
     }
 
+    uint32 activeWidth = rawProcessor->imgdata.sizes.raw_width - rawProcessor->imgdata.sizes.left_margin - rawProcessor->imgdata.sizes.right_margin;
+    uint32 activeHeight = rawProcessor->imgdata.sizes.raw_height - rawProcessor->imgdata.sizes.top_margin - rawProcessor->imgdata.sizes.bottom_margin;
+
+    uint32 rawWidth = rawProcessor->imgdata.sizes.raw_width;
+    uint32 rawHeight = rawProcessor->imgdata.sizes.raw_height;
+
+    switch (rawProcessor->imgdata.sizes.flip)
+    {
+    case 3:
+        m_BaseOrientation = dng_orientation::Rotate180();
+        break;
+
+    case 5:
+        m_BaseOrientation = dng_orientation::Rotate90CCW();
+        break;
+
+    case 6:
+        m_BaseOrientation = dng_orientation::Rotate90CW();
+        break;
+
+    default:
+        m_BaseOrientation = dng_orientation::Normal();
+        break;
+    }
+
     libraw_data_t imgdata = rawProcessor->imgdata;
 
     bool fujiRotate90 = false;
-    if ((0 == memcmp("FUJIFILM", imgdata.idata.make, std::min((size_t)8, sizeof(imgdata.idata.make)))) &&
+    if ((0 == memcmp("FUJIFILM", rawProcessor->imgdata.idata.make, std::min((size_t)8, sizeof(rawProcessor->imgdata.idata.make)))) &&
             (2 == rawProcessor->COLOR(0, 1)) &&
             (1 == rawProcessor->COLOR(1, 0)))
     {
         fujiRotate90 = true;
+
         imgdata.sizes.iheight = rawProcessor->imgdata.sizes.iwidth;
         imgdata.sizes.iwidth = rawProcessor->imgdata.sizes.iheight;
-        imgdata.sizes.top_margin = rawProcessor->imgdata.sizes.left_margin;
-        imgdata.sizes.left_margin = rawProcessor->imgdata.sizes.bottom_margin;
-        imgdata.sizes.bottom_margin = rawProcessor->imgdata.sizes.right_margin;
-        imgdata.sizes.right_margin = rawProcessor->imgdata.sizes.top_margin;
-        imgdata.sizes.flip = 6;
-        m_FinalSize = dng_rect(m_FinalSize.W(), m_FinalSize.H());
+
+        uint32 tmp = activeWidth;
+        activeWidth = activeHeight;
+        activeHeight = tmp;
+
+        tmp = finalWidth;
+        finalWidth = finalHeight;
+        finalHeight = tmp;
+
+        tmp = rawWidth;
+        rawWidth = rawHeight;
+        rawHeight = tmp;
+
+        m_BaseOrientation += dng_orientation::Mirror90CCW();
     }
 
-    fBounds = dng_rect(imgdata.sizes.iheight, imgdata.sizes.iwidth);
-    fPlanes = (imgdata.idata.filters == 0) ? 3 : 1;
+    if (entireSensorData == true)
+        fBounds = dng_rect(rawHeight, rawWidth);
+    else
+        fBounds = dng_rect(activeHeight, activeWidth);
+
+    m_Pattern = rawProcessor->imgdata.idata.filters;
+    m_Channels = rawProcessor->imgdata.idata.colors;
+
+    fPlanes = (m_Pattern == 0) ? 3 : 1;
     uint32 pixelType = ttShort;
     uint32 pixelSize = TagTypeSize(pixelType);
     uint32 bytes = fBounds.H() * fBounds.W() * fPlanes * pixelSize;
@@ -146,7 +191,7 @@ void LibRawImage::Parse(dng_stream &stream)
     m_Buffer.fPixelSize  = pixelSize;
     m_Buffer.fData       = m_Memory->Buffer();
 
-    if (rawProcessor->imgdata.idata.filters == 0)
+    if (m_Pattern == 0)
     {
         unsigned short* output = (unsigned short*)m_Buffer.fData;
 
@@ -154,7 +199,7 @@ void LibRawImage::Parse(dng_stream &stream)
         {
             for (unsigned int col = 0; col < rawProcessor->imgdata.sizes.iwidth; col++)
             {
-                for (int color = 0; color < rawProcessor->imgdata.idata.colors; color++)
+                for (int color = 0; color < m_Channels; color++)
                 {
                     *output = rawProcessor->imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][color];
                     *output++;
@@ -193,29 +238,71 @@ void LibRawImage::Parse(dng_stream &stream)
         }
     }
 
-    if (entireSensorData == true)
+    for(uint32 i = 0; i < 4; i++)
     {
-        m_ActiveArea = dng_rect(imgdata.sizes.top_margin,
-                                imgdata.sizes.left_margin,
-                                imgdata.sizes.iheight - imgdata.sizes.bottom_margin,
-                                imgdata.sizes.iwidth - imgdata.sizes.right_margin);
+        switch(rawProcessor->imgdata.idata.cdesc[i])
+        {
+        case 'R':
+            m_CFAPlaneColor[i] = colorKeyRed;
+            break;
+        case 'G':
+            m_CFAPlaneColor[i] = colorKeyGreen;
+            break;
+        case 'B':
+            m_CFAPlaneColor[i] = colorKeyBlue;
+            break;
+        case 'C':
+            m_CFAPlaneColor[i] = colorKeyCyan;
+            break;
+        case 'M':
+            m_CFAPlaneColor[i] = colorKeyMagenta;
+            break;
+        case 'Y':
+            m_CFAPlaneColor[i] = colorKeyYellow;
+            break;
+        default:
+            m_CFAPlaneColor[i] = colorKeyMaxEnum;
+        }
+    }
+
+    m_DefaultScaleH = dng_urational(finalWidth, activeWidth);
+    m_DefaultScaleV = dng_urational(finalHeight, activeHeight);
+
+    if (m_Pattern != 0)
+    {
+        m_DefaultCropOriginH = dng_urational(8, 1);
+        m_DefaultCropOriginV = dng_urational(8, 1);
+        m_DefaultCropSizeH = dng_urational(activeWidth - 16, 1);
+        m_DefaultCropSizeV = dng_urational(activeHeight - 16, 1);
     }
     else
     {
-        m_ActiveArea = dng_rect(imgdata.sizes.iheight,
-                                imgdata.sizes.iwidth);
+        m_DefaultCropOriginH = dng_urational(0, 1);
+        m_DefaultCropOriginV = dng_urational(0, 1);
+        m_DefaultCropSizeH = dng_urational(activeWidth, 1);
+        m_DefaultCropSizeV = dng_urational(activeHeight, 1);
     }
 
-    m_CameraNeutral = dng_vector(rawProcessor->imgdata.idata.colors);
-    for (int i = 0; i < rawProcessor->imgdata.idata.colors; i++)
+    if (entireSensorData == true)
+    {
+        m_ActiveArea = dng_rect(rawProcessor->imgdata.sizes.top_margin,
+                                rawProcessor->imgdata.sizes.left_margin,
+                                activeHeight,
+                                activeWidth);
+    }
+    else
+    {
+        m_ActiveArea = dng_rect(activeHeight, activeWidth);
+    }
+
+    m_CameraNeutral = dng_vector(m_Channels);
+    for (int i = 0; i < m_Channels; i++)
     {
         m_CameraNeutral[i] = 1.0 / rawProcessor->imgdata.color.cam_mul[i];
     }
 
     m_MakeName.Set_ASCII(rawProcessor->imgdata.idata.make);
     m_ModelName.Set_ASCII(rawProcessor->imgdata.idata.model);
-
-    m_Channels = rawProcessor->imgdata.idata.colors;
 
     m_BlackLevel = dng_vector(4);
     m_WhiteLevel = dng_vector(4);
@@ -225,7 +312,7 @@ void LibRawImage::Parse(dng_stream &stream)
         m_WhiteLevel[i] = rawProcessor->imgdata.color.maximum;
     }
 
-    switch (rawProcessor->imgdata.idata.colors)
+    switch (m_Channels)
     {
     case 3:
     {
@@ -361,11 +448,6 @@ const dng_rect& LibRawImage::ActiveArea() const
     return m_ActiveArea;
 }
 
-const dng_rect& LibRawImage::FinalSize() const
-{
-    return m_FinalSize;
-}
-
 uint32 LibRawImage::Channels() const
 {
     return m_Channels;
@@ -394,4 +476,53 @@ const real64 LibRawImage::WhiteLevel(uint32 channel) const
     }
 
     return 0.0;
+}
+
+const dng_urational& LibRawImage::DefaultScaleH() const
+{
+    return m_DefaultScaleH;
+}
+
+const dng_urational& LibRawImage::DefaultScaleV() const
+{
+    return m_DefaultScaleV;
+}
+
+const dng_urational& LibRawImage::DefaultCropSizeH() const
+{
+    return m_DefaultCropSizeH;
+}
+
+const dng_urational& LibRawImage::DefaultCropSizeV() const
+{
+    return m_DefaultCropSizeV;
+}
+
+const dng_urational& LibRawImage::DefaultCropOriginH() const
+{
+    return m_DefaultCropOriginH;
+}
+
+const dng_urational& LibRawImage::DefaultCropOriginV() const
+{
+    return m_DefaultCropOriginV;
+}
+
+const dng_orientation LibRawImage::Orientation() const
+{
+    return m_BaseOrientation;
+}
+
+uint32 LibRawImage::Pattern() const
+{
+    return m_Pattern;
+}
+
+ColorKeyCode LibRawImage::ColorKey(uint32 plane) const
+{
+    if (plane < 4)
+    {
+        return m_CFAPlaneColor[plane];
+    }
+    return colorKeyMaxEnum;
 }

@@ -53,7 +53,6 @@
 #include "zlib.h"
 #define CHUNK 65536
 
-#include "rawhelper.h"
 #include "exiv2meta.h"
 #include "librawimage.h"
 
@@ -124,16 +123,6 @@ int main(int argc, const char* argv [])
 
     const char* filename = argv[index++];
 
-
-    RawHelper rawProcessor;
-    libraw_data_t imgdata;
-    int ret = rawProcessor.identifyRawData(filename, &imgdata);
-    if(ret != 0)
-    {
-        printf("can not extract raw data");
-        return 1;
-    }
-
     dng_memory_allocator memalloc(gDefaultDNGMemoryAllocator);
 
     DngHost host(&memalloc);
@@ -149,18 +138,9 @@ int main(int argc, const char* argv [])
 
     AutoPtr<dng_negative> negative(host.Make_dng_negative());
 
-    negative->SetDefaultScale(dng_urational(rawImage->FinalSize().W(), rawImage->ActiveArea().W()),
-                              dng_urational(rawImage->FinalSize().H(), rawImage->ActiveArea().H()));
-    if (imgdata.idata.filters != 0)
-    {
-        negative->SetDefaultCropOrigin(8, 8);
-        negative->SetDefaultCropSize(rawImage->ActiveArea().W() - 16, rawImage->ActiveArea().H() - 16);
-    }
-    else
-    {
-        negative->SetDefaultCropOrigin(0, 0);
-        negative->SetDefaultCropSize(rawImage->ActiveArea().W(), rawImage->ActiveArea().H());
-    }
+    negative->SetDefaultScale(rawImage->DefaultScaleH(), rawImage->DefaultScaleV());
+    negative->SetDefaultCropOrigin(rawImage->DefaultCropOriginH(), rawImage->DefaultCropOriginV());
+    negative->SetDefaultCropSize(rawImage->DefaultCropSizeH(), rawImage->DefaultCropSizeV());
     negative->SetActiveArea(rawImage->ActiveArea());
 
     std::string file(filename);
@@ -170,39 +150,12 @@ int main(int argc, const char* argv [])
     negative->SetOriginalRawFileName(file.c_str());
 
     negative->SetColorChannels(rawImage->Channels());
-
-    ColorKeyCode colorCodes[4] = {colorKeyMaxEnum, colorKeyMaxEnum, colorKeyMaxEnum, colorKeyMaxEnum};
-    for(uint32 i = 0; i < 4; i++)
-    {
-        switch(imgdata.idata.cdesc[i])
-        {
-        case 'R':
-            colorCodes[i] = colorKeyRed;
-            break;
-        case 'G':
-            colorCodes[i] = colorKeyGreen;
-            break;
-        case 'B':
-            colorCodes[i] = colorKeyBlue;
-            break;
-        case 'C':
-            colorCodes[i] = colorKeyCyan;
-            break;
-        case 'M':
-            colorCodes[i] = colorKeyMagenta;
-            break;
-        case 'Y':
-            colorCodes[i] = colorKeyYellow;
-            break;
-        }
-    }
-
-    negative->SetColorKeys(colorCodes[0], colorCodes[1], colorCodes[2], colorCodes[3]);
+    negative->SetColorKeys(rawImage->ColorKey(0), rawImage->ColorKey(1), rawImage->ColorKey(2), rawImage->ColorKey(3));
 
     uint32 bayerPhase = 0xFFFFFFFF;
     if (rawImage->Channels() == 4)
     {
-        negative->SetQuadMosaic(imgdata.idata.filters);
+        negative->SetQuadMosaic(rawImage->Pattern());
     }
     else if (0 == memcmp("FUJIFILM", rawImage->MakeName().Get(), std::min((uint32)8, (uint32)sizeof(rawImage->MakeName().Get()))))
     {
@@ -210,7 +163,7 @@ int main(int argc, const char* argv [])
     }
     else
     {
-        switch(imgdata.idata.filters)
+        switch(rawImage->Pattern())
         {
         case 0xe1e1e1e1:
             bayerPhase = 0;
@@ -251,26 +204,7 @@ int main(int argc, const char* argv [])
     negative->SetBaselineNoise(1.0);
     negative->SetBaselineSharpness(1.0);
 
-    dng_orientation orientation;
-    switch (imgdata.sizes.flip)
-    {
-    case 3:
-        orientation = dng_orientation::Rotate180();
-        break;
-
-    case 5:
-        orientation = dng_orientation::Rotate90CCW();
-        break;
-
-    case 6:
-        orientation = dng_orientation::Rotate90CW();
-        break;
-
-    default:
-        orientation = dng_orientation::Normal();
-        break;
-    }
-    negative->SetBaseOrientation(orientation);
+    negative->SetBaseOrientation(rawImage->Orientation());
 
     negative->SetAntiAliasStrength(dng_urational(100, 100));
     negative->SetLinearResponseLimit(1.0);
@@ -326,9 +260,6 @@ int main(int argc, const char* argv [])
                         continue;
                     if ((unsigned) col >= image->Width() || (unsigned) row >= image->Height())
                         continue;
-                    //currently ignore timestamp
-                    //if (time > timestamp)
-                    //    continue;
                     badPixelList->AddPoint(dng_point(row, col));
                 }
                 fclose(fp);
@@ -400,6 +331,8 @@ int main(int argc, const char* argv [])
             streamPriv.Get(blockPriv->Buffer(), (uint32)streamPriv.Length());
             negative->SetPrivateData(blockPriv);
         }
+
+        negative->RebuildIPTC(true, false);
     }
 
     // -----------------------------------------------------------------------------------------
@@ -502,9 +435,6 @@ int main(int argc, const char* argv [])
 
     // Compute demosaiced image (used by preview and thumbnail)
     negative->BuildStage3Image(host);
-
-    negative->SynchronizeMetadata();
-    negative->RebuildIPTC(true, false);
 
     // -----------------------------------------------------------------------------------------
 
