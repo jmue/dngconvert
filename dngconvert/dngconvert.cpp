@@ -351,6 +351,21 @@ int main(int argc, const char* argv [])
 
     // -----------------------------------------------------------------------------------------
 
+    // Exif CFA Pattern
+    if (mosaicinfo != NULL)
+    {
+      dng_exif* exifData = negative->GetExif();
+      exifData->fCFARepeatPatternCols = mosaicinfo->fCFAPatternSize.v;
+      exifData->fCFARepeatPatternRows = mosaicinfo->fCFAPatternSize.h;
+      for (uint16 c = 0; c < exifData->fCFARepeatPatternCols; c++)
+      {
+        for (uint16 r = 0; r < exifData->fCFARepeatPatternRows; r++)
+        {
+          exifData->fCFAPattern[r][c] = mosaicinfo->fCFAPattern[c][r];
+        }
+      }
+    }
+
     if (exiffilename == NULL)
         // read exif from raw file
         exiffilename = filename;
