@@ -213,22 +213,6 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
         dng_urational urat = dng_urational(0, 0);
         uint32 val = 0;
 
-        // CFA Pattern
-        /*
-        if (mosaicinfo != NULL)
-        {
-            m_Exif->fCFARepeatPatternCols = mosaicinfo->fCFAPatternSize.v;
-            m_Exif->fCFARepeatPatternRows = mosaicinfo->fCFAPatternSize.h;
-            for (uint16 c = 0; c < m_Exif->fCFARepeatPatternCols; c++)
-            {
-                for (uint16 r = 0; r < m_Exif->fCFARepeatPatternRows; r++)
-                {
-                    m_Exif->fCFAPattern[r][c] = mosaicinfo->fCFAPattern[c][r];
-                }
-            }
-        }
-        */
-
         // Standard Exif tags
 
         getExifTag(exifData, "Exif.Image.Artist", &m_Exif->fArtist);
@@ -430,6 +414,9 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
 
         if (getExifTag(exifData, "Exif.CanonCs.MaxAperture", 0, &val))
             m_Exif->fMaxApertureValue = dng_urational(val, 32);
+
+        if (getExifTag(exifData, "Exif.CanonSi.SubjectDistance", 0, &val) && (val > 0))
+            m_Exif->fSubjectDistance = dng_urational(val, 100);
 
         uint32 canonLensUnits = 1;
         if (getExifTag(exifData, "Exif.CanonCs.Lens", 2, &urat))
