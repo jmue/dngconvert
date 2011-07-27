@@ -139,17 +139,12 @@ void LibRawImage::Parse(dng_stream &stream)
         break;
     }
 
-    libraw_data_t imgdata = rawProcessor->imgdata;
-
     bool fujiRotate90 = false;
     if ((0 == memcmp("FUJIFILM", rawProcessor->imgdata.idata.make, std::min((size_t)8, sizeof(rawProcessor->imgdata.idata.make)))) &&
             (2 == rawProcessor->COLOR(0, 1)) &&
             (1 == rawProcessor->COLOR(1, 0)))
     {
         fujiRotate90 = true;
-
-        imgdata.sizes.iheight = rawProcessor->imgdata.sizes.iwidth;
-        imgdata.sizes.iwidth = rawProcessor->imgdata.sizes.iheight;
 
         uint32 tmp = activeWidth;
         activeWidth = activeHeight;
