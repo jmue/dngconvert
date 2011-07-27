@@ -118,18 +118,25 @@ void Exiv2DngStreamIO::transfer(BasicIo& src)
 
 int Exiv2DngStreamIO::seek(long offset, Position pos)
 {
+    uint64 newIdx;
+    uint64 length = m_Stream.Length();
     switch (pos)
     {
     case BasicIo::cur:
-        m_Stream.SetReadPosition(m_Stream.Position() + offset);
+        newIdx = m_Stream.Position() + offset;
         break;
     case BasicIo::beg:
-        m_Stream.SetReadPosition(offset);
+        newIdx = offset;
         break;
     case BasicIo::end:
-        m_Stream.SetReadPosition(m_Stream.Length() + offset);
+        newIdx = length + offset;
         break;
     }
+
+    if (newIdx < 0 || newIdx > length)
+        return 1;
+
+    m_Stream.SetReadPosition(newIdx);
 
     return 0;
 }

@@ -51,18 +51,28 @@ int LibRawDngDataStream::seek(INT64 offset, int whence)
     if (substream)
         return substream->seek(offset, whence);
 
+    uint64 newIdx;
+    uint64 length = m_Stream.Length();
     switch (whence)
     {
     case SEEK_SET:
-        m_Stream.SetReadPosition(offset);
+        newIdx = offset;
         break;
     case SEEK_CUR:
-        m_Stream.SetReadPosition(m_Stream.Position() + offset);
+        newIdx = m_Stream.Position() + offset;
         break;
     case SEEK_END:
-        m_Stream.SetReadPosition(m_Stream.Length() + offset);
+        newIdx = length + offset;
         break;
     }
+
+    if(newIdx < 0)
+        newIdx = 0;
+    else if (newIdx > length)
+        newIdx = length;
+
+    m_Stream.SetReadPosition(newIdx);
+
     return (int)m_Stream.Position();
 }
 
