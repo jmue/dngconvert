@@ -167,7 +167,7 @@ void LibRawImage::Parse(dng_stream &stream)
         fBounds = dng_rect(activeHeight, activeWidth);
 
     m_Pattern = rawProcessor->imgdata.idata.filters;
-    m_Channels = rawProcessor->imgdata.idata.colors;
+    m_Channels = (uint32)rawProcessor->imgdata.idata.colors;
 
     fPlanes = (m_Pattern == 0) ? 3 : 1;
     uint32 pixelType = ttShort;
@@ -194,7 +194,7 @@ void LibRawImage::Parse(dng_stream &stream)
         {
             for (unsigned int col = 0; col < rawProcessor->imgdata.sizes.iwidth; col++)
             {
-                for (int color = 0; color < m_Channels; color++)
+                for (uint32 color = 0; color < m_Channels; color++)
                 {
                     *output = rawProcessor->imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][color];
                     *output++;
@@ -291,7 +291,7 @@ void LibRawImage::Parse(dng_stream &stream)
     }
 
     m_CameraNeutral = dng_vector(m_Channels);
-    for (int i = 0; i < m_Channels; i++)
+    for (uint32 i = 0; i < m_Channels; i++)
     {
         m_CameraNeutral[i] = 1.0 / rawProcessor->imgdata.color.cam_mul[i];
     }
