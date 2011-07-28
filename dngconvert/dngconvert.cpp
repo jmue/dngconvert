@@ -68,10 +68,11 @@ int main(int argc, const char* argv [])
                 "dngconvert - DNG convertion tool\n"
                 "Usage: %s [options] <dngfile>\n"
                 "Valid options:\n"
-                "  -d <filename>     include dead pixel list\n"
-                "  -e                embed original\n"
-                "  -p <filename>     use adobe camera profile\n"
-                "  -x <filename>|-   read EXIF from this file, - to disable\n",
+                "  -dcp <filename>      use adobe camera profile\n"
+                "  -dpl <filename>      include dead pixel list\n"
+                "  -e                   embed original\n"
+                "  -meta <filename>|-   read exif/xmp from this file, - to disable\n"
+                "  -o <filename>        specify output filename\n",
                 argv[0]);
 
         return -1;
@@ -94,12 +95,12 @@ int main(int argc, const char* argv [])
             outfilename = argv[++index];
         }
 
-        if (0 == strcmp(option.c_str(), "d"))
+        if (0 == strcmp(option.c_str(), "dpl"))
         {
             deadpixelfilename = argv[++index];
         }
 
-        if (0 == strcmp(option.c_str(), "p"))
+        if (0 == strcmp(option.c_str(), "dcp"))
         {
             profilefilename = argv[++index];
         }
@@ -109,7 +110,7 @@ int main(int argc, const char* argv [])
             embedOriginal = true;
         }
         
-        if (0 == strcmp(option.c_str(), "x"))
+        if (0 == strcmp(option.c_str(), "meta"))
         {
             exiffilename = argv[++index];
         }
