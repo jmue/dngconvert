@@ -25,11 +25,14 @@
 #include "dnghost.h"
 #include "dngimagewriter.h"
 
+#include "dng_camera_profile.h"
 #include "dng_color_space.h"
 #include "dng_file_stream.h"
 #include "dng_image.h"
 #include "dng_info.h"
 #include "dng_memory_stream.h"
+#include "dng_opcodes.h"
+#include "dng_opcode_list.h"
 #include "dng_parse_utils.h"
 #include "dng_string.h"
 #include "dng_render.h"
@@ -107,10 +110,30 @@ int main(int argc, const char* argv [])
         negative->PostParse(host, stream, info);
 
         printf("Model: %s\n", negative->ModelName().Get());
+        printf("\n");
+        dng_rect defaultCropArea = negative->DefaultCropArea();
+        dng_rect activeArea = negative->GetLinearizationInfo()->fActiveArea;
+        printf("FinalImageSize: %i x %i\n", negative->DefaultFinalWidth(), negative->DefaultFinalHeight());
+        printf("RawImageSize: %i x %i\n", info.fIFD[info.fMainIndex]->fImageWidth, info.fIFD[info.fMainIndex]->fImageLength);
+        printf("ActiveArea: %i, %i : %i x %i\n", activeArea.t, activeArea.l, activeArea.W(), activeArea.H());
+        printf("DefaultCropArea: %i, %i : %i x %i\n", defaultCropArea.t, defaultCropArea.l, defaultCropArea.W(), defaultCropArea.H());
+        printf("\n");
         printf("OriginalData: %i bytes\n", negative->OriginalRawFileDataLength());
         printf("PrivateData: %i bytes\n", negative->PrivateLength());
-        printf("CameraProfiles : %i\n", negative->ProfileCount());
-
+        printf("\n");
+        printf("CameraProfiles: %i\n", negative->ProfileCount());
+        for (uint32 i = 0; i < negative->ProfileCount(); i++)
+        {
+            printf("  Profile: %i\n", i);
+            dng_camera_profile dcp = negative->ProfileByIndex(i);
+            printf("    Name: %s\n", dcp.Name().Get());
+            printf("    Copyright: %s\n", dcp.Copyright().Get());
+        }
+        printf("\n");
+        printf("Opcodes(1): %i\n", info.fIFD[info.fMainIndex]->fOpcodeList1Count);
+        printf("Opcodes(2): %i\n", info.fIFD[info.fMainIndex]->fOpcodeList2Count);
+        printf("Opcodes(3): %i\n", info.fIFD[info.fMainIndex]->fOpcodeList3Count);
+        printf("\n");
         printf("MainImage: %i\n", info.fMainIndex);
         printf("ChainedCount: %i\n", info.fChainedIFDCount);
         printf("\n");
