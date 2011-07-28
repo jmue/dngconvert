@@ -282,8 +282,8 @@ void LibRawImage::Parse(dng_stream &stream)
     {
         m_ActiveArea = dng_rect(rawProcessor->imgdata.sizes.top_margin,
                                 rawProcessor->imgdata.sizes.left_margin,
-                                activeHeight,
-                                activeWidth);
+                                rawProcessor->imgdata.sizes.top_margin + activeHeight,
+                                rawProcessor->imgdata.sizes.left_margin + activeWidth);
     }
     else
     {
