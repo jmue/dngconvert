@@ -297,9 +297,12 @@ int main(int argc, const char* argv [])
       }
     }
 
+    bool readFromSidecar = false;
     if (exiffilename == NULL)
         // read exif from raw file
         exiffilename = filename;
+    else
+        readFromSidecar = true;
     // '-x -' disables exif reading
     if (strcmp(exiffilename, "-") != 0)
     {
@@ -324,7 +327,7 @@ int main(int argc, const char* argv [])
         if (xmpData != NULL)
         {
             AutoPtr<dng_memory_block> xmpBlock(xmpData->Serialize());
-            negative->SetXMP(host, xmpBlock->Buffer(), xmpBlock->LogicalSize());
+            negative->SetXMP(host, xmpBlock->Buffer(), xmpBlock->LogicalSize(), readFromSidecar);
             negative->SynchronizeMetadata();
         }
 

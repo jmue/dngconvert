@@ -21,6 +21,7 @@
 #include "exiv2dngstreamio.h"
 
 #include <dng_rational.h>
+#include <dng_orientation.h>
 
 #include <exiv2/exif.hpp>
 #include <exiv2/image.hpp>
@@ -551,6 +552,12 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
 
         m_XMP.Reset(new dng_xmp(host.Allocator()));
         m_XMP->Parse(host, xmpPacket.c_str(), xmpPacket.length());
+        if (getExifTag(exifData, "Exif.Image.Orientation", 0, &val))
+        {
+            dng_orientation orientation;
+            orientation.SetTIFF(val);
+            m_XMP->SetOrientation(orientation);
+        }
 
         // Makernotes
 
