@@ -454,6 +454,8 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
         {
             m_Exif->fFirmware.Replace("Firmware", "");
             m_Exif->fFirmware.Replace("Version", "");
+            m_Exif->fFirmware.TrimLeadingBlanks();
+            m_Exif->fFirmware.TrimTrailingBlanks();
         }
 
         if (getExifTag(exifData, "Exif.CanonSi.ISOSpeed", &str))
