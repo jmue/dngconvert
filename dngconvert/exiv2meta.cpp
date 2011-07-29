@@ -220,6 +220,7 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
         getExifTag(exifData, "Exif.Image.BatteryLevel", 0, &m_Exif->fBatteryLevelR);
         getExifTag(exifData, "Exif.Image.CameraSerialNumber", &m_Exif->fCameraSerialNumber);
         getExifTag(exifData, "Exif.Image.Copyright", &m_Exif->fCopyright);
+        getExifTag(exifData, "Exif.Image.DateTime", &m_Exif->fDateTime);
         getExifTag(exifData, "Exif.Image.Make", &m_Exif->fMake);
         getExifTag(exifData, "Exif.Image.Model", &m_Exif->fModel);
         getExifTag(exifData, "Exif.Image.ImageDescription", &m_Exif->fImageDescription);
