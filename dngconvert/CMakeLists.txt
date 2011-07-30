@@ -78,9 +78,10 @@ TARGET_LINK_LIBRARIES(dngconvert ${ZLIB_LIBRARIES}
                                  ${LIBRAW_LIBRARIES}
                                  ${LCMS_LIBRARIES}
                                  ${CMAKE_THREAD_LIBS_INIT}
+                                 xmpsdk
+                                 dngsdk
                                  dng)
 
 # add the install targets
 INSTALL(TARGETS dngconvert DESTINATION bin)
-INSTALL(FILES "${PROJECT_BINARY_DIR}/dngconvertconfig.h"
-         DESTINATION include)
+#INSTALL(FILES "${PROJECT_BINARY_DIR}/dngconvertconfig.h" DESTINATION include)
