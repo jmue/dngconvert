@@ -27,6 +27,7 @@ ADD_DEFINITIONS(${LCMS_DEFINITIONS})
 
 INCLUDE_DIRECTORIES( ${dngconvert_SOURCE_DIR}/libdng )
 INCLUDE_DIRECTORIES( ${dngconvert_SOURCE_DIR}/libdng/contrib/dng_sdk/source )
+INCLUDE_DIRECTORIES( ${PROJECT_BINARY_DIR} )
 
 # Set platteforms env.
 IF(WIN32)
@@ -79,3 +80,7 @@ TARGET_LINK_LIBRARIES(dngconvert ${ZLIB_LIBRARIES}
                                  ${CMAKE_THREAD_LIBS_INIT}
                                  dng)
 
+# add the install targets
+INSTALL(TARGETS dngconvert DESTINATION bin)
+INSTALL(FILES "${PROJECT_BINARY_DIR}/dngconvertconfig.h"
+         DESTINATION include)

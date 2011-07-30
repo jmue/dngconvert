@@ -43,4 +43,8 @@ ADD_EXECUTABLE( dngcompare ${DNGCOMPARE_SRCS} )
 
 TARGET_LINK_LIBRARIES( dngcompare ${CMAKE_THREAD_LIBS_INIT} dng)
 
-#INSTALL( TARGETS dngcompare ${INSTALL_TARGETS_DEFAULT_ARGS} )
+# add the install targets
+INSTALL(TARGETS dngcompare DESTINATION bin)
+INSTALL(FILES "${PROJECT_BINARY_DIR}/dngconvertconfig.h"
+         DESTINATION include)
+

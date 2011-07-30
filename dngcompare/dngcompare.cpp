@@ -596,7 +596,7 @@ int main(int argc, const char* argv [])
     {
         fprintf(stderr,
                 "\n"
-                "dngcompare - DNG information tool\n"
+                "dngcompare - DNG comparsion tool\n"
                 "Usage: %s [options] <dngfile1> <dngfile2>\n",
                 argv[0]);
 

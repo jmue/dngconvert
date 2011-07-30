@@ -26,6 +26,8 @@
 #include <string>
 #include <assert.h>
 
+#include "dngconvertconfig.h"
+
 #include "dng_bad_pixels.h"
 #include "dng_camera_profile.h"
 #include "dng_color_space.h"

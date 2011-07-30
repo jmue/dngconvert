@@ -1,0 +1,4 @@
+ 
+// the configured options and settings for dngconvert
+#define dngconvert_VERSION_MAJOR @Tutorial_VERSION_MAJOR@
+#define dngconvert_VERSION_MINOR @Tutorial_VERSION_MINOR@
