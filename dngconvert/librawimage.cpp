@@ -60,7 +60,7 @@ void LibRawImage::Parse(dng_stream &stream)
     ret = rawProcessor->adjust_sizes_info_only();
     if (ret != LIBRAW_SUCCESS)
     {
-        printf("LibRaw: failed to run adjust_sizes_info_only: %s", libraw_strerror(ret));
+        printf("LibRaw: failed to run adjust_sizes_info_only: %s\n", libraw_strerror(ret));
         rawProcessor->recycle();
         return;
     }
@@ -96,7 +96,7 @@ void LibRawImage::Parse(dng_stream &stream)
     ret = rawProcessor->unpack();
     if (ret != LIBRAW_SUCCESS)
     {
-        printf("LibRaw: failed to run unpack: %s", libraw_strerror(ret));
+        printf("LibRaw: failed to run unpack: %s\n", libraw_strerror(ret));
         rawProcessor->recycle();
         return;
     }
@@ -108,7 +108,7 @@ void LibRawImage::Parse(dng_stream &stream)
         ret = rawProcessor->add_masked_borders_to_bitmap();
         if (ret != LIBRAW_SUCCESS)
         {
-            printf("LibRaw: failed to run add_masked_borders_to_bitmap: %s", libraw_strerror(ret));
+            printf("LibRaw: failed to run add_masked_borders_to_bitmap: %s\n", libraw_strerror(ret));
             rawProcessor->recycle();
             return;
         }
@@ -323,7 +323,7 @@ void LibRawImage::Parse(dng_stream &stream)
         camXYZ[2][2] = rawProcessor->imgdata.color.cam_xyz[2][2];
         if (camXYZ.MaxEntry() == 0.0)
         {
-            printf("Warning, camera XYZ Matrix is null");
+            printf("Warning, camera XYZ Matrix is null\n");
             camXYZ = dng_matrix_3by3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
         }
 
@@ -348,7 +348,7 @@ void LibRawImage::Parse(dng_stream &stream)
         camXYZ[3][2] = rawProcessor->imgdata.color.cam_xyz[3][2];
         if (camXYZ.MaxEntry() == 0.0)
         {
-            printf("Warning, camera XYZ Matrix is null");
+            printf("Warning, camera XYZ Matrix is null\n");
             camXYZ = dng_matrix_4by3(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
         }
 

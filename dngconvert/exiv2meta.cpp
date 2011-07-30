@@ -34,7 +34,7 @@
 void printExiv2ExceptionError(const char* msg, Exiv2::Error& e)
 {
     std::string s(e.what());
-    fprintf(stderr, "%s  (Error #%i: %s)\n", msg, e.code(), s.c_str());
+    fprintf(stderr, "Exiv2: %s  (Error #%i: %s)\n", msg, e.code(), s.c_str());
 }
 
 bool getExifTag(const Exiv2::ExifData& exifData, const char* exifTagName, dng_string* value)
@@ -53,7 +53,7 @@ bool getExifTag(const Exiv2::ExifData& exifData, const char* exifTagName, dng_st
     }
     catch(Exiv2::Error& e)
     {
-        std::string err = std::string("Cannot find Exif String value from key '") + std::string(exifTagName) + std::string("' into image using Exiv2 ");
+        std::string err = std::string("Cannot find Exif String value from key '") + std::string(exifTagName);
         printExiv2ExceptionError(err.c_str(), e);
     }
 
@@ -76,7 +76,7 @@ bool getExifTag(const Exiv2::ExifData& exifData, const char* exifTagName, dng_da
     }
     catch(Exiv2::Error& e)
     {
-        std::string err = std::string("Cannot find Exif String value from key '") + std::string(exifTagName) + std::string("' into image using Exiv2 ");
+        std::string err = std::string("Cannot find Exif String value from key '") + std::string(exifTagName);
         printExiv2ExceptionError(err.c_str(), e);
     }
 
@@ -97,7 +97,7 @@ bool getExifTag(const Exiv2::ExifData& exifData, const char* exifTagName, int32 
     }
     catch(Exiv2::Error& e)
     {
-        std::string err = std::string("Cannot find Exif Rational value from key '") + std::string(exifTagName) + std::string("' into image using Exiv2 ");
+        std::string err = std::string("Cannot find Exif Rational value from key '") + std::string(exifTagName);
         printExiv2ExceptionError(err.c_str(), e);
     }
 
@@ -118,7 +118,7 @@ bool getExifTag(const Exiv2::ExifData& exifData, const char* exifTagName, int32 
     }
     catch(Exiv2::Error& e)
     {
-        std::string err = std::string("Cannot find Exif Rational value from key '") + std::string(exifTagName) + std::string("' into image using Exiv2 ");
+        std::string err = std::string("Cannot find Exif Rational value from key '") + std::string(exifTagName);
         printExiv2ExceptionError(err.c_str(), e);
     }
 
@@ -138,7 +138,7 @@ bool getExifTag(const Exiv2::ExifData& exifData, const char* exifTagName, int32 
     }
     catch(Exiv2::Error& e)
     {
-        std::string err = std::string("Cannot find Exif Long value from key '") + std::string(exifTagName) + std::string("' into image using Exiv2 ");
+        std::string err = std::string("Cannot find Exif Long value from key '") + std::string(exifTagName);
         printExiv2ExceptionError(err.c_str(), e);
     }
 
@@ -160,7 +160,7 @@ bool getExifTagData(const Exiv2::ExifData& exifData, const char* exifTagName, lo
     }
     catch(Exiv2::Error& e)
     {
-        std::string err = std::string("Cannot find Exif value from key '") + std::string(exifTagName) + std::string("' into image using Exiv2 ");
+        std::string err = std::string("Cannot find Exif value from key '") + std::string(exifTagName);
         printExiv2ExceptionError(err.c_str(), e);
     }
 
@@ -192,7 +192,7 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
 
         if (!image.get())
         {
-            fprintf(stderr, "Stream is not readable\n");
+            fprintf(stderr, "Exiv2Meta: Stream is not readable\n");
             return;
         }
 
@@ -581,7 +581,7 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
     }
     catch( Exiv2::Error& e )
     {
-        printExiv2ExceptionError("Cannot load metadata using Exiv2", e);
+        printExiv2ExceptionError("Cannot load metadata", e);
     }
 }
 
