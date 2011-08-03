@@ -1,4 +1,6 @@
-
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 SET( EXIV2_MIN_VERSION "0.21" )
 FIND_PACKAGE( Exiv2 )
