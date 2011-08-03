@@ -329,9 +329,13 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
         if (getExifTag(exifData, "Exif.Nikon3.SerialNO", &m_Exif->fCameraSerialNumber))
         {
             m_Exif->fCameraSerialNumber.Replace("No=", "");
+            m_Exif->fCameraSerialNumber.Replace("NO=", "");
+            m_Exif->fCameraSerialNumber.TrimLeadingBlanks();
+            m_Exif->fCameraSerialNumber.TrimTrailingBlanks();
         }
 
         getExifTag(exifData, "Exif.Nikon3.SerialNumber", &m_Exif->fCameraSerialNumber);
+
         getExifTag(exifData, "Exif.Nikon3.ShutterCount", 0, &m_Exif->fImageNumber);
         if (getExifTag(exifData, "Exif.NikonLd1.LensIDNumber", 0, &val))
         {
@@ -448,7 +452,7 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
         }
 
         getExifTag(exifData, "Exif.Canon.OwnerName", &m_Exif->fOwnerName);
-
+        getExifTag(exifData, "Exif.Canon.OwnerName", &m_Exif->fArtist);
 
         if (getExifTag(exifData, "Exif.Canon.FirmwareVersion", &m_Exif->fFirmware))
         {
