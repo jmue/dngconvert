@@ -62,7 +62,7 @@
 #include "dngimagewriter.h"
 
 int main(int argc, const char* argv [])
-{
+{  
     if(argc == 1)
     {
         fprintf(stderr,
@@ -125,6 +125,8 @@ int main(int argc, const char* argv [])
     }
 
     const char* filename = argv[index++];
+
+    dng_xmp_sdk::InitializeSDK();
 
     dng_memory_allocator memalloc(gDefaultDNGMemoryAllocator);
 
@@ -519,6 +521,8 @@ int main(int argc, const char* argv [])
     dng_file_stream filestream(lpszOutFileName.c_str(), true);
 
     writer.WriteDNG(host, filestream, *negative.Get(), thumbnail, ccJPEG, &previewList);
+
+    dng_xmp_sdk::TerminateSDK();
 
     return 0;
 }
