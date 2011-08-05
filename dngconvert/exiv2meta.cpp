@@ -328,8 +328,7 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
 
         if (getExifTag(exifData, "Exif.Nikon3.SerialNO", &m_Exif->fCameraSerialNumber))
         {
-            m_Exif->fCameraSerialNumber.Replace("No=", "");
-            m_Exif->fCameraSerialNumber.Replace("NO=", "");
+            m_Exif->fCameraSerialNumber.Replace("NO=", "", false);
             m_Exif->fCameraSerialNumber.TrimLeadingBlanks();
             m_Exif->fCameraSerialNumber.TrimTrailingBlanks();
         }
