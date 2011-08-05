@@ -15,21 +15,25 @@
    along with this library; see the file COPYING.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.
+
+   This file uses code from dng_threaded_host.cpp -- Sandy McGuffog CornerFix utility
+   (http://sourceforge.net/projects/cornerfix, sandy dot cornerfix at gmail dot com),
+   dng_threaded_host.cpp is copyright 2007-2011, by Sandy McGuffog and Contributors.
 */
 
-#pragma once
+#ifndef __dngtagcodes__
+#define __dngtagcodes__
 
-#include "dng_host.h"
+#include "dng_tag_codes.h"
 
-class DngHost : public dng_host
+enum
 {
-public:
-    DngHost(dng_memory_allocator *allocator = NULL, dng_abort_sniffer *sniffer = NULL);
-    ~DngHost(void);
-
-public:
-    virtual dng_exif* Make_dng_exif();
-    virtual dng_ifd* Make_dng_ifd();
-    virtual dng_negative* Make_dng_negative();
-    virtual void PerformAreaTask (dng_area_task &task, const dng_rect &area);
+    tcCameraOwnerName = 42032,
+    tcBodySerialNumber = 42033,
+    tcLensSpecification = 42034,
+    tcLensMake = 42035,
+    tcLensModel = 42036,
+    tcLensSerialNumber = 42037
 };
+
+#endif

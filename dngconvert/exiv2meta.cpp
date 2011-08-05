@@ -226,7 +226,9 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
         getExifTag(exifData, "Exif.Image.ImageDescription", &m_Exif->fImageDescription);
         getExifTag(exifData, "Exif.Image.Software", &m_Exif->fSoftware);
         getExifTag(exifData, "Exif.Photo.ApertureValue", 0, &m_Exif->fApertureValue);
+        getExifTag(exifData, "Exif.Photo.BodySerialNumber", &m_Exif->fCameraSerialNumber);
         getExifTag(exifData, "Exif.Photo.BrightnessValue", 0, &m_Exif->fBrightnessValue);
+        getExifTag(exifData, "Exif.Photo.CameraOwnerName", &m_Exif->fOwnerName);
         getExifTag(exifData, "Exif.Photo.ComponentsConfiguration", 0, &m_Exif->fComponentsConfiguration);
         getExifTag(exifData, "Exif.Photo.Contrast", 0, &m_Exif->fContrast);
         getExifTag(exifData, "Exif.Photo.CustomRendered", 0, &m_Exif->fCustomRendered);
@@ -248,6 +250,12 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
         getExifTag(exifData, "Exif.Photo.GainControl", 0, &m_Exif->fGainControl);
         getExifTag(exifData, "Exif.Photo.ISOSpeedRatings", 0, &m_Exif->fISOSpeedRatings[0]);
         getExifTag(exifData, "Exif.Photo.LightSource", 0, &m_Exif->fLightSource);
+        getExifTag(exifData, "Exif.Photo.LensModel", &m_Exif->fLensName);
+        getExifTag(exifData, "Exif.Photo.LensSpecification", 0, &m_Exif->fLensInfo[0]);
+        getExifTag(exifData, "Exif.Photo.LensSpecification", 1, &m_Exif->fLensInfo[1]);
+        getExifTag(exifData, "Exif.Photo.LensSpecification", 2, &m_Exif->fLensInfo[2]);
+        getExifTag(exifData, "Exif.Photo.LensSpecification", 3, &m_Exif->fLensInfo[3]);
+        getExifTag(exifData, "Exif.Photo.LensSerialNumber", &m_Exif->fLensSerialNumber);
         getExifTag(exifData, "Exif.Photo.MaxApertureValue", 0, &m_Exif->fMaxApertureValue);
         getExifTag(exifData, "Exif.Photo.MeteringMode", 0, &m_Exif->fMeteringMode);
         getExifTag(exifData, "Exif.Photo.PixelXDimension", 0, &m_Exif->fPixelXDimension);
