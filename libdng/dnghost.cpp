@@ -24,6 +24,7 @@
 #include "dnghost.h"
 #include "dngnegative.h"
 #include "dngifd.h"
+#include "dngexif.h"
 #include "dng_abort_sniffer.h"
 #include "dng_area_task.h"
 
@@ -298,6 +299,16 @@ dng_negative* DngHost::Make_dng_negative()
 dng_ifd* DngHost::Make_dng_ifd()
 {
     dng_ifd *result = new DngIfd();
+    if (!result)
+    {
+        ThrowMemoryFull();
+    }
+    return result;
+}
+
+dng_exif* DngHost::Make_dng_exif ()
+{
+    dng_exif *result = new DngExif();
     if (!result)
     {
         ThrowMemoryFull();

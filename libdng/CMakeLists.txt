@@ -168,11 +168,6 @@ TARGET_LINK_LIBRARIES( dngsdk xmpsdk )
 
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
-# Private headers which are only needed for the library itself
-SET( LIBDNG_PRIVATE_HDR 
-    ${CMAKE_CURRENT_SOURCE_DIR}/dng_threaded_host.cpp
-   )
-
 # Add standalone C++ header files to this list
 SET( LIBDNG_HDR         
     ${CMAKE_CURRENT_SOURCE_DIR}/dnghost.h
@@ -181,7 +176,9 @@ SET( LIBDNG_HDR
     ${CMAKE_CURRENT_SOURCE_DIR}/dngmosaicinfo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dngnegative.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dngreadimage.h
-   )
+    ${CMAKE_CURRENT_SOURCE_DIR}/dngexif.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/dngtagcodes.h
+    )
 
 # Add library C++ source files to this list
 SET( LIBDNG_SRCS
@@ -191,7 +188,7 @@ SET( LIBDNG_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/dngmosaicinfo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dngnegative.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dngreadimage.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/dng_threaded_host.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dngexif.cpp
    )
 
 # Library
