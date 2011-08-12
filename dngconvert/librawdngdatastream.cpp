@@ -149,3 +149,11 @@ int LibRawDngDataStream::eof()
 
     return m_Stream.Position() >= m_Stream.Length();
 }
+
+#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
+void* LibRawDngDataStream::make_jas_stream()
+{
+    return NULL;
+}
+#endif
+

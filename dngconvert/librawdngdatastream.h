@@ -24,6 +24,13 @@
 
 #include "dng_stream.h"
 
+#if (LIBRAW_MAJOR_VERSION == 0)
+#if (LIBRAW_MINOR_VERSION == 13)
+#define LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(major,minor) \
+    (LIBRAW_MAKE_VERSION(major,minor,0) <= (LIBRAW_VERSION & 0xffff00))
+#endif
+#endif
+
 class LibRawDngDataStream : public LibRaw_abstract_datastream
 {
 public:
@@ -38,6 +45,11 @@ public:
     virtual char* gets(char* str, int size);
     virtual int scanf_one(const char* fmt, void* val);
     virtual int eof();
+    
+#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
+    virtual void* make_jas_stream();
+#endif
+
 
 protected:
     dng_stream& m_Stream;
