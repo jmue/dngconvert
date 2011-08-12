@@ -51,7 +51,7 @@ long Exiv2DngStreamIO::write(const Exiv2::byte* data, long wcount)
 {
     uint64 oldPos = m_Stream.Position();
     m_Stream.Get((void*)data, wcount);
-    return m_Stream.Position() - oldPos;
+    return (long)(m_Stream.Position() - oldPos);
 }
 
 long Exiv2DngStreamIO::write(BasicIo& src)
@@ -91,8 +91,8 @@ long Exiv2DngStreamIO::read(Exiv2::byte* buf, long rcount)
 {
     uint64 oldPos = m_Stream.Position();
     uint64 bytes = std::min((uint64)rcount, m_Stream.Length() - oldPos);
-    m_Stream.Get((void*)buf, bytes);
-    return m_Stream.Position() - oldPos;
+    m_Stream.Get((void*)buf, (int32)bytes);
+    return (long)(m_Stream.Position() - oldPos);
 }
 
 int Exiv2DngStreamIO::getb()
@@ -158,12 +158,12 @@ int Exiv2DngStreamIO::munmap()
 
 long Exiv2DngStreamIO::tell() const
 {
-    return m_Stream.Position();
+    return (long)m_Stream.Position();
 }
 
 long Exiv2DngStreamIO::size() const
 {
-    return m_Stream.Length();
+    return (long)m_Stream.Length();
 }
 
 bool Exiv2DngStreamIO::isopen() const
