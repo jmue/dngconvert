@@ -246,9 +246,6 @@ void LibRawImage::Parse(dng_stream &stream)
     }
     else if(decoder_info.decoder_flags & LIBRAW_DECODER_FLATFIELD)
     {
-        if (!iparams->cdesc[3])
-            iparams->cdesc[3] = 'G';
-
         unsigned short* output = (unsigned short*)m_Buffer.fData;
 
         if (entireSensorData == true)
