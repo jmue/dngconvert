@@ -52,6 +52,12 @@ void LibRawImage::Parse(dng_stream &stream)
     AutoPtr<LibRawDngDataStream> rawStream(new LibRawDngDataStream(stream));
     AutoPtr<LibRaw> rawProcessor(new LibRaw());
 
+#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
+    {
+        rawProcessor->imgdata.params.user_flip = 0;
+    }
+#endif
+
     int ret = rawProcessor->open_datastream(rawStream.Get());
     if (ret != LIBRAW_SUCCESS)
     {
@@ -59,12 +65,6 @@ void LibRawImage::Parse(dng_stream &stream)
         rawProcessor->recycle();
         return;
     }
-
-#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
-    {
-        rawProcessor->imgdata.params.user_flip = 0;
-    }
-#endif
 
     ret = rawProcessor->adjust_sizes_info_only();
     if (ret != LIBRAW_SUCCESS)
@@ -96,14 +96,7 @@ void LibRawImage::Parse(dng_stream &stream)
     rawProcessor->recycle();
 
     rawStream.Get()->seek(0, SEEK_SET);
-    ret = rawProcessor->open_datastream(rawStream.Get());
-    if (ret != LIBRAW_SUCCESS)
-    {
-        printf("Cannot open stream: %s\n", libraw_strerror(ret));
-        rawProcessor->recycle();
-        return;
-    }
-
+    
     rawProcessor->imgdata.params.output_bps = 16;
     rawProcessor->imgdata.params.document_mode = 2;
     rawProcessor->imgdata.params.shot_select = 0;
@@ -113,6 +106,13 @@ void LibRawImage::Parse(dng_stream &stream)
     }
 #endif
 
+    ret = rawProcessor->open_datastream(rawStream.Get());
+    if (ret != LIBRAW_SUCCESS)
+    {
+        printf("Cannot open stream: %s\n", libraw_strerror(ret));
+        rawProcessor->recycle();
+        return;
+    }
 
     ret = rawProcessor->unpack();
     if (ret != LIBRAW_SUCCESS)
@@ -126,15 +126,9 @@ void LibRawImage::Parse(dng_stream &stream)
     libraw_iparams_t *iparams = NULL;
     libraw_colordata_t *colors = NULL;
 
-#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
-    sizes = &rawProcessor->imgdata.rawdata.sizes;
-    iparams = &rawProcessor->imgdata.rawdata.iparams;
-    colors = &rawProcessor->imgdata.rawdata.color;
-#else
     sizes = &rawProcessor->imgdata.sizes;
     iparams = &rawProcessor->imgdata.idata;
     colors = &rawProcessor->imgdata.color;
-#endif
 
     uint32 activeWidth = sizes->width;
     uint32 activeHeight = sizes->height;
