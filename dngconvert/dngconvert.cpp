@@ -61,6 +61,9 @@
 #include "dnghost.h"
 #include "dngimagewriter.h"
 
+using std::min;
+using std::max;
+
 int main(int argc, const char* argv [])
 {  
     if(argc == 1)
@@ -149,7 +152,7 @@ int main(int argc, const char* argv [])
     negative->SetActiveArea(rawImage->ActiveArea());
 
     std::string file(filename);
-    size_t found = std::min(file.rfind("\\"), file.rfind("/"));
+    size_t found = min(file.rfind("\\"), file.rfind("/"));
     if (found != std::string::npos)
         file = file.substr(found + 1, file.length() - found - 1);
     negative->SetOriginalRawFileName(file.c_str());
@@ -162,7 +165,7 @@ int main(int argc, const char* argv [])
     {
         negative->SetQuadMosaic(rawImage->Pattern());
     }
-    else if (0 == memcmp("FUJIFILM", rawImage->MakeName().Get(), std::min((uint32)8, (uint32)sizeof(rawImage->MakeName().Get()))))
+    else if (0 == memcmp("FUJIFILM", rawImage->MakeName().Get(), min((uint32)8, (uint32)sizeof(rawImage->MakeName().Get()))))
     {
         negative->SetFujiMosaic(0);
     }
@@ -392,7 +395,7 @@ int main(int argc, const char* argv [])
 
         for (uint32 block = 0; block < forkBlocks; block++)
         {
-            uint32 originalBlockLength = (uint32)std::min((uint64)CHUNK,
+            uint32 originalBlockLength = (uint32)min((uint64)CHUNK,
                                                           originalDataStream.Length() - originalDataStream.Position());
             originalDataStream.Get(inBuffer, originalBlockLength);
 

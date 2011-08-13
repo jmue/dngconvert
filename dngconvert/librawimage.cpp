@@ -25,6 +25,9 @@
 
 #include "libraw/libraw.h"
 
+using std::min;
+using std::max;
+
 LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
     :	dng_image(dng_rect(0, 0), 0, ttShort),
       m_Memory(),
@@ -178,7 +181,7 @@ void LibRawImage::Parse(dng_stream &stream)
     }
 
     bool fujiRotate90 = false;
-    if ((0 == memcmp("FUJIFILM", iparams->make, std::min((size_t)8, sizeof(iparams->make)))) &&
+    if ((0 == memcmp("FUJIFILM", iparams->make, min((size_t)8, sizeof(iparams->make)))) &&
             (2 == rawProcessor->COLOR(0, 1)) &&
             (1 == rawProcessor->COLOR(1, 0)))
     {

@@ -26,6 +26,9 @@
 #include <exiv2/types.hpp>
 #include <exiv2/error.hpp>
 
+using std::min;
+using std::max;
+
 Exiv2DngStreamIO::Exiv2DngStreamIO(dng_stream& stream, dng_memory_allocator &allocator)
     : m_Allocator(allocator), m_Stream(stream), m_MemBlock(0)
 {
@@ -90,7 +93,7 @@ Exiv2::DataBuf Exiv2DngStreamIO::read(long rcount)
 long Exiv2DngStreamIO::read(Exiv2::byte* buf, long rcount)
 {
     uint64 oldPos = m_Stream.Position();
-    uint64 bytes = std::min((uint64)rcount, m_Stream.Length() - oldPos);
+    uint64 bytes = min((uint64)rcount, m_Stream.Length() - oldPos);
     m_Stream.Get((void*)buf, (int32)bytes);
     return (long)(m_Stream.Position() - oldPos);
 }
