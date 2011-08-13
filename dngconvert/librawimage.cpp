@@ -133,14 +133,19 @@ void LibRawImage::Parse(dng_stream &stream)
     colors = &rawProcessor->imgdata.color;
 #endif
 
+    uint32 activeWidth = sizes->width;
+    uint32 activeHeight = sizes->height;
+    uint32 rawWidth = sizes->raw_width;
+    uint32 rawHeight = sizes->raw_height;
+
     bool entireSensorData = false;
 #if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
-    if (0 == strcmp(rawProcessor->imgdata.idata.make, "Canon"))
+    if (0 == strcmp(iparams->make, "Canon"))
     {
         entireSensorData = true;
     }
 #else
-    if (0 == strcmp(rawProcessor->imgdata.idata.make, "Canon") && (rawProcessor->imgdata.idata.filters != 0))
+    if (0 == strcmp(iparams->make, "Canon") && (iparams->filters != 0))
     {
         entireSensorData = true;
         ret = rawProcessor->add_masked_borders_to_bitmap();
@@ -152,11 +157,6 @@ void LibRawImage::Parse(dng_stream &stream)
         }
     }
 #endif
-
-    uint32 activeWidth = sizes->width;
-    uint32 activeHeight = sizes->height;
-    uint32 rawWidth = sizes->raw_width;
-    uint32 rawHeight = sizes->raw_height;
 
     switch (sizes->flip)
     {
