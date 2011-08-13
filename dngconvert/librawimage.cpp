@@ -57,6 +57,12 @@ void LibRawImage::Parse(dng_stream &stream)
         return;
     }
 
+#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
+    {
+        rawProcessor->imgdata.params.user_flip = 0;
+    }
+#endif
+
     ret = rawProcessor->adjust_sizes_info_only();
     if (ret != LIBRAW_SUCCESS)
     {
@@ -67,6 +73,11 @@ void LibRawImage::Parse(dng_stream &stream)
 
     uint32 finalWidth = 0;
     uint32 finalHeight = 0;
+
+#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
+    finalWidth = rawProcessor->imgdata.sizes.iwidth;
+    finalHeight = rawProcessor->imgdata.sizes.iheight;
+#else
     if ((rawProcessor->imgdata.sizes.flip == 5) || (rawProcessor->imgdata.sizes.flip == 6))
     {
         finalHeight = rawProcessor->imgdata.sizes.iwidth;
@@ -77,6 +88,7 @@ void LibRawImage::Parse(dng_stream &stream)
         finalHeight = rawProcessor->imgdata.sizes.iheight;
         finalWidth = rawProcessor->imgdata.sizes.iwidth;
     }
+#endif
 
     rawProcessor->recycle();
 
@@ -92,6 +104,12 @@ void LibRawImage::Parse(dng_stream &stream)
     rawProcessor->imgdata.params.output_bps = 16;
     rawProcessor->imgdata.params.document_mode = 2;
     rawProcessor->imgdata.params.shot_select = 0;
+#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
+    {
+        rawProcessor->imgdata.params.user_flip = -1;
+    }
+#endif
+
 
     ret = rawProcessor->unpack();
     if (ret != LIBRAW_SUCCESS)
@@ -101,8 +119,33 @@ void LibRawImage::Parse(dng_stream &stream)
         return;
     }
 
+    libraw_image_sizes_t *sizes = NULL;
+    libraw_iparams_t *iparams = NULL;
+    libraw_colordata_t *colors = NULL;
+
+#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
+    sizes = &rawProcessor->imgdata.rawdata.sizes;
+    iparams = &rawProcessor->imgdata.rawdata.iparams;
+    colors = &rawProcessor->imgdata.rawdata.color;
+#else
+    sizes = &rawProcessor->imgdata.sizes;
+    iparams = &rawProcessor->imgdata.idata;
+    colors = &rawProcessor->imgdata.color;
+#endif
+
+    uint32 activeWidth = sizes->width;
+    uint32 activeHeight = sizes->height;
+    uint32 rawWidth = sizes->raw_width;
+    uint32 rawHeight = sizes->raw_height;
+
     bool entireSensorData = false;
-    if (0 == strcmp(rawProcessor->imgdata.idata.make, "Canon") && (rawProcessor->imgdata.idata.filters != 0))
+#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
+    if (0 == strcmp(iparams->make, "Canon"))
+    {
+        entireSensorData = true;
+    }
+#else
+    if (0 == strcmp(iparams->make, "Canon") && (iparams->filters != 0))
     {
         entireSensorData = true;
         ret = rawProcessor->add_masked_borders_to_bitmap();
@@ -113,14 +156,9 @@ void LibRawImage::Parse(dng_stream &stream)
             return;
         }
     }
+#endif
 
-    uint32 activeWidth = rawProcessor->imgdata.sizes.raw_width - rawProcessor->imgdata.sizes.left_margin - rawProcessor->imgdata.sizes.right_margin;
-    uint32 activeHeight = rawProcessor->imgdata.sizes.raw_height - rawProcessor->imgdata.sizes.top_margin - rawProcessor->imgdata.sizes.bottom_margin;
-
-    uint32 rawWidth = rawProcessor->imgdata.sizes.raw_width;
-    uint32 rawHeight = rawProcessor->imgdata.sizes.raw_height;
-
-    switch (rawProcessor->imgdata.sizes.flip)
+    switch (sizes->flip)
     {
     case 3:
         m_BaseOrientation = dng_orientation::Rotate180();
@@ -140,7 +178,7 @@ void LibRawImage::Parse(dng_stream &stream)
     }
 
     bool fujiRotate90 = false;
-    if ((0 == memcmp("FUJIFILM", rawProcessor->imgdata.idata.make, std::min((size_t)8, sizeof(rawProcessor->imgdata.idata.make)))) &&
+    if ((0 == memcmp("FUJIFILM", iparams->make, std::min((size_t)8, sizeof(iparams->make)))) &&
             (2 == rawProcessor->COLOR(0, 1)) &&
             (1 == rawProcessor->COLOR(1, 0)))
     {
@@ -166,8 +204,8 @@ void LibRawImage::Parse(dng_stream &stream)
     else
         fBounds = dng_rect(activeHeight, activeWidth);
 
-    m_Pattern = rawProcessor->imgdata.idata.filters;
-    m_Channels = (uint32)rawProcessor->imgdata.idata.colors;
+    m_Pattern = iparams->filters;
+    m_Channels = (uint32)iparams->colors;
 
     fPlanes = (m_Pattern == 0) ? 3 : 1;
     uint32 pixelType = ttShort;
@@ -186,17 +224,89 @@ void LibRawImage::Parse(dng_stream &stream)
     m_Buffer.fPixelSize  = pixelSize;
     m_Buffer.fData       = m_Memory->Buffer();
 
+#if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
+    libraw_decoder_info_t decoder_info;
+    rawProcessor->get_decoder_info(&decoder_info);
+
+    if (decoder_info.decoder_flags & LIBRAW_DECODER_LEGACY)
+    {
+        unsigned short* output = (unsigned short*)m_Buffer.fData;
+
+        for (unsigned int row = 0; row < sizes->raw_height; row++)
+        {
+            for (unsigned int col = 0; col < sizes->raw_width; col++)
+            {
+                for (uint32 color = 0; color < m_Channels; color++)
+                {
+                    *output = rawProcessor->imgdata.rawdata.color_image[row * sizes->raw_width + col][color];
+                    *output++;
+                }
+            }
+        }
+    }
+    else if(decoder_info.decoder_flags & LIBRAW_DECODER_FLATFIELD)
+    {
+        unsigned short* output = (unsigned short*)m_Buffer.fData;
+
+        if (entireSensorData == true)
+        {
+            if (fujiRotate90 == false)
+            {
+                memcpy(output, rawProcessor->imgdata.rawdata.raw_image, sizes->raw_height * sizes->raw_width * sizeof(unsigned short));
+            }
+            else
+            {
+                for (unsigned int col = 0; col < sizes->raw_width; col++)
+                {
+                    for (unsigned int row = 0; row < sizes->raw_height; row++)
+                    {
+                        *output = rawProcessor->imgdata.rawdata.raw_image[row * sizes->raw_width + col];
+                        *output++;
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (fujiRotate90 == false)
+            {
+                for (unsigned int row = sizes->top_margin; row < sizes->height + sizes->top_margin; row++)
+                {
+                    memcpy(output + row * sizes->width, rawProcessor->imgdata.rawdata.raw_image + row * sizes->raw_width, sizes->width * sizeof(unsigned short));
+                }
+            }
+            else
+            {
+                for (unsigned int col = sizes->left_margin; col < sizes->width + sizes->left_margin; col++)
+                {
+                    for (unsigned int row = sizes->top_margin; row < sizes->height + sizes->top_margin; row++)
+                    {
+                        *output = rawProcessor->imgdata.rawdata.raw_image[row * sizes->raw_width + col];
+                        *output++;
+                    }
+                }
+            }
+        }
+
+    }
+    else
+    {
+        printf("LibRaw: unsupported decoder\n");
+        rawProcessor->recycle();
+        return;
+    }
+#else
     if (m_Pattern == 0)
     {
         unsigned short* output = (unsigned short*)m_Buffer.fData;
 
-        for (unsigned int row = 0; row < rawProcessor->imgdata.sizes.iheight; row++)
+        for (unsigned int row = 0; row < sizes->iheight; row++)
         {
-            for (unsigned int col = 0; col < rawProcessor->imgdata.sizes.iwidth; col++)
+            for (unsigned int col = 0; col < sizes->iwidth; col++)
             {
                 for (uint32 color = 0; color < m_Channels; color++)
                 {
-                    *output = rawProcessor->imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][color];
+                    *output = rawProcessor->imgdata.image[row * sizes->iwidth + col][color];
                     *output++;
                 }
             }
@@ -204,38 +314,39 @@ void LibRawImage::Parse(dng_stream &stream)
     }
     else
     {
-        if (!rawProcessor->imgdata.idata.cdesc[3])
-            rawProcessor->imgdata.idata.cdesc[3] = 'G';
+        if (!iparams->cdesc[3])
+            iparams->cdesc[3] = 'G';
 
         unsigned short* output = (unsigned short*)m_Buffer.fData;
 
         if (fujiRotate90 == false)
         {
-            for (unsigned int row = 0; row < rawProcessor->imgdata.sizes.iheight; row++)
+            for (unsigned int row = 0; row < sizes->iheight; row++)
             {
-                for (unsigned int col = 0; col < rawProcessor->imgdata.sizes.iwidth; col++)
+                for (unsigned int col = 0; col < sizes->iwidth; col++)
                 {
-                    *output = rawProcessor->imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][rawProcessor->COLOR(row, col)];
+                    *output = rawProcessor->imgdata.image[row * sizes->iwidth + col][rawProcessor->COLOR(row, col)];
                     *output++;
                 }
             }
         }
         else
         {
-            for (unsigned int col = 0; col < rawProcessor->imgdata.sizes.iwidth; col++)
+            for (unsigned int col = 0; col < sizes->iwidth; col++)
             {
-                for (unsigned int row = 0; row < rawProcessor->imgdata.sizes.iheight; row++)
+                for (unsigned int row = 0; row < sizes->iheight; row++)
                 {
-                    *output = rawProcessor->imgdata.image[row * rawProcessor->imgdata.sizes.iwidth + col][rawProcessor->COLOR(row, col)];
+                    *output = rawProcessor->imgdata.image[row * sizes->iwidth + col][rawProcessor->COLOR(row, col)];
                     *output++;
                 }
             }
         }
     }
+#endif
 
     for(uint32 i = 0; i < 4; i++)
     {
-        switch(rawProcessor->imgdata.idata.cdesc[i])
+        switch(iparams->cdesc[i])
         {
         case 'R':
             m_CFAPlaneColor[i] = colorKeyRed;
@@ -280,10 +391,10 @@ void LibRawImage::Parse(dng_stream &stream)
 
     if (entireSensorData == true)
     {
-        m_ActiveArea = dng_rect(rawProcessor->imgdata.sizes.top_margin,
-                                rawProcessor->imgdata.sizes.left_margin,
-                                rawProcessor->imgdata.sizes.top_margin + activeHeight,
-                                rawProcessor->imgdata.sizes.left_margin + activeWidth);
+        m_ActiveArea = dng_rect(sizes->top_margin,
+                                sizes->left_margin,
+                                sizes->top_margin + activeHeight,
+                                sizes->left_margin + activeWidth);
     }
     else
     {
@@ -293,18 +404,18 @@ void LibRawImage::Parse(dng_stream &stream)
     m_CameraNeutral = dng_vector(m_Channels);
     for (uint32 i = 0; i < m_Channels; i++)
     {
-        m_CameraNeutral[i] = 1.0 / rawProcessor->imgdata.color.cam_mul[i];
+        m_CameraNeutral[i] = 1.0 / colors->cam_mul[i];
     }
 
-    m_MakeName.Set_ASCII(rawProcessor->imgdata.idata.make);
-    m_ModelName.Set_ASCII(rawProcessor->imgdata.idata.model);
+    m_MakeName.Set_ASCII(iparams->make);
+    m_ModelName.Set_ASCII(iparams->model);
 
     m_BlackLevel = dng_vector(4);
     m_WhiteLevel = dng_vector(4);
     for (int i = 0; i < 4; i++)
     {
-        m_BlackLevel[i] = rawProcessor->imgdata.color.black + rawProcessor->imgdata.color.cblack[i];
-        m_WhiteLevel[i] = rawProcessor->imgdata.color.maximum;
+        m_BlackLevel[i] = colors->black + colors->cblack[i];
+        m_WhiteLevel[i] = colors->maximum;
     }
 
     switch (m_Channels)
@@ -312,15 +423,15 @@ void LibRawImage::Parse(dng_stream &stream)
     case 3:
     {
         dng_matrix_3by3 camXYZ;
-        camXYZ[0][0] = rawProcessor->imgdata.color.cam_xyz[0][0];
-        camXYZ[0][1] = rawProcessor->imgdata.color.cam_xyz[0][1];
-        camXYZ[0][2] = rawProcessor->imgdata.color.cam_xyz[0][2];
-        camXYZ[1][0] = rawProcessor->imgdata.color.cam_xyz[1][0];
-        camXYZ[1][1] = rawProcessor->imgdata.color.cam_xyz[1][1];
-        camXYZ[1][2] = rawProcessor->imgdata.color.cam_xyz[1][2];
-        camXYZ[2][0] = rawProcessor->imgdata.color.cam_xyz[2][0];
-        camXYZ[2][1] = rawProcessor->imgdata.color.cam_xyz[2][1];
-        camXYZ[2][2] = rawProcessor->imgdata.color.cam_xyz[2][2];
+        camXYZ[0][0] = colors->cam_xyz[0][0];
+        camXYZ[0][1] = colors->cam_xyz[0][1];
+        camXYZ[0][2] = colors->cam_xyz[0][2];
+        camXYZ[1][0] = colors->cam_xyz[1][0];
+        camXYZ[1][1] = colors->cam_xyz[1][1];
+        camXYZ[1][2] = colors->cam_xyz[1][2];
+        camXYZ[2][0] = colors->cam_xyz[2][0];
+        camXYZ[2][1] = colors->cam_xyz[2][1];
+        camXYZ[2][2] = colors->cam_xyz[2][2];
         if (camXYZ.MaxEntry() == 0.0)
         {
             printf("Warning, camera XYZ Matrix is null\n");
@@ -334,18 +445,18 @@ void LibRawImage::Parse(dng_stream &stream)
     case 4:
     {
         dng_matrix_4by3 camXYZ;
-        camXYZ[0][0] = rawProcessor->imgdata.color.cam_xyz[0][0];
-        camXYZ[0][1] = rawProcessor->imgdata.color.cam_xyz[0][1];
-        camXYZ[0][2] = rawProcessor->imgdata.color.cam_xyz[0][2];
-        camXYZ[1][0] = rawProcessor->imgdata.color.cam_xyz[1][0];
-        camXYZ[1][1] = rawProcessor->imgdata.color.cam_xyz[1][1];
-        camXYZ[1][2] = rawProcessor->imgdata.color.cam_xyz[1][2];
-        camXYZ[2][0] = rawProcessor->imgdata.color.cam_xyz[2][0];
-        camXYZ[2][1] = rawProcessor->imgdata.color.cam_xyz[2][1];
-        camXYZ[2][2] = rawProcessor->imgdata.color.cam_xyz[2][2];
-        camXYZ[3][0] = rawProcessor->imgdata.color.cam_xyz[3][0];
-        camXYZ[3][1] = rawProcessor->imgdata.color.cam_xyz[3][1];
-        camXYZ[3][2] = rawProcessor->imgdata.color.cam_xyz[3][2];
+        camXYZ[0][0] = colors->cam_xyz[0][0];
+        camXYZ[0][1] = colors->cam_xyz[0][1];
+        camXYZ[0][2] = colors->cam_xyz[0][2];
+        camXYZ[1][0] = colors->cam_xyz[1][0];
+        camXYZ[1][1] = colors->cam_xyz[1][1];
+        camXYZ[1][2] = colors->cam_xyz[1][2];
+        camXYZ[2][0] = colors->cam_xyz[2][0];
+        camXYZ[2][1] = colors->cam_xyz[2][1];
+        camXYZ[2][2] = colors->cam_xyz[2][2];
+        camXYZ[3][0] = colors->cam_xyz[3][0];
+        camXYZ[3][1] = colors->cam_xyz[3][1];
+        camXYZ[3][2] = colors->cam_xyz[3][2];
         if (camXYZ.MaxEntry() == 0.0)
         {
             printf("Warning, camera XYZ Matrix is null\n");
