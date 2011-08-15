@@ -236,7 +236,7 @@ void LibRawImage::Parse(dng_stream &stream)
                 for (uint32 color = 0; color < m_Channels; color++)
                 {
                     *output = rawProcessor->imgdata.rawdata.color_image[row * sizes->raw_width + col][color];
-                    output++;
+                    ++output;
                 }
             }
         }
@@ -258,7 +258,7 @@ void LibRawImage::Parse(dng_stream &stream)
                     for (unsigned int row = 0; row < sizes->raw_height; row++)
                     {
                         *output = rawProcessor->imgdata.rawdata.raw_image[row * sizes->raw_width + col];
-                        output++;
+                        ++output;
                     }
                 }
             }
@@ -283,7 +283,7 @@ void LibRawImage::Parse(dng_stream &stream)
                     for (unsigned int row = sizes->top_margin; row < sizes->height + sizes->top_margin; row++)
                     {
                         *output = rawProcessor->imgdata.rawdata.raw_image[row * sizes->raw_width + col];
-                        output++;
+                        ++output;
                     }
                 }
             }
@@ -308,7 +308,7 @@ void LibRawImage::Parse(dng_stream &stream)
                 for (uint32 color = 0; color < m_Channels; color++)
                 {
                     *output = rawProcessor->imgdata.image[row * sizes->iwidth + col][color];
-                    output++;
+                    ++output;
                 }
             }
         }
@@ -327,7 +327,7 @@ void LibRawImage::Parse(dng_stream &stream)
                 for (unsigned int col = 0; col < sizes->iwidth; col++)
                 {
                     *output = rawProcessor->imgdata.image[row * sizes->iwidth + col][rawProcessor->COLOR(row, col)];
-                    output++;
+                    ++output;
                 }
             }
         }
@@ -338,7 +338,7 @@ void LibRawImage::Parse(dng_stream &stream)
                 for (unsigned int row = 0; row < sizes->iheight; row++)
                 {
                     *output = rawProcessor->imgdata.image[row * sizes->iwidth + col][rawProcessor->COLOR(row, col)];
-                    output++;
+                    ++output;
                 }
             }
         }
