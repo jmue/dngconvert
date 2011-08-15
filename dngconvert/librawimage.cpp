@@ -268,7 +268,7 @@ void LibRawImage::Parse(dng_stream &stream)
             if (fujiRotate90 == false)
             {
                 unsigned short* input = rawProcessor->imgdata.rawdata.raw_image;
-                input += sizes->left_margin;
+                input += sizes->left_margin + sizes->top_margin * sizes->raw_width;
                 for (unsigned int row = sizes->top_margin; row < sizes->height + sizes->top_margin; row++)
                 {
                     memcpy(output, input, sizes->width * sizeof(unsigned short));
