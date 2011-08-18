@@ -230,14 +230,12 @@ int main(int argc, const char* argv [])
     }
     else
     {
-        char* lpszProfName = new char[255];
-        strcpy(lpszProfName, rawImage->MakeName().Get());
-        strcat(lpszProfName, " ");
-        strcat(lpszProfName, rawImage->ModelName().Get());
+        dng_string profName;
+        profName.Append(rawImage->MakeName().Get());
+        profName.Append(" ");
+        profName.Append(rawImage->ModelName().Get());
 
-        prof->SetName(lpszProfName);
-        delete lpszProfName;
-
+        prof->SetName(profName.Get());
         prof->SetColorMatrix1((dng_matrix) rawImage->ColorMatrix());
         prof->SetCalibrationIlluminant1(lsD65);
     }
@@ -264,7 +262,7 @@ int main(int argc, const char* argv [])
                     cp = strchr(line, '#');
                     if (cp)
                         *cp = 0;
-                    if (sscanf (line, "%d %d %d", &col, &row, &time) < 2)
+                    if (sscanf(line, "%d %d %d", &col, &row, &time) < 2)
                         continue;
                     if ((unsigned) col >= image->Width() || (unsigned) row >= image->Height())
                         continue;
