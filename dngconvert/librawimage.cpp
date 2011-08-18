@@ -137,10 +137,7 @@ void LibRawImage::Parse(dng_stream &stream)
 
     bool entireSensorData = false;
 #if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
-    if (0 == strcmp(iparams->make, "Canon"))
-    {
-        entireSensorData = true;
-    }
+    entireSensorData = true;
 #else
     if (0 == strcmp(iparams->make, "Canon") && (iparams->filters != 0))
     {
