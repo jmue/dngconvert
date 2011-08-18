@@ -138,6 +138,8 @@ void LibRawImage::Parse(dng_stream &stream)
     bool entireSensorData = false;
 #if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
     entireSensorData = true;
+    rawWidth = max(rawWidth, (uint32)(sizes->width + sizes->left_margin));
+    rawHeight = max(rawHeight, (uint32)(sizes->height + sizes->top_margin));
 #else
     if (0 == strcmp(iparams->make, "Canon") && (iparams->filters != 0))
     {
