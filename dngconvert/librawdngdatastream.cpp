@@ -54,7 +54,7 @@ int LibRawDngDataStream::seek(INT64 offset, int whence)
     if (substream)
         return substream->seek(offset, whence);
 
-    uint64 newIdx;
+    uint64 newIdx = 0;
     uint64 length = m_Stream.Length();
     switch (whence)
     {

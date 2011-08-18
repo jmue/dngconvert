@@ -121,7 +121,7 @@ void Exiv2DngStreamIO::transfer(BasicIo& src)
 
 int Exiv2DngStreamIO::seek(long offset, Position pos)
 {
-    uint64 newIdx;
+    uint64 newIdx = 0;
     uint64 length = m_Stream.Length();
     switch (pos)
     {
