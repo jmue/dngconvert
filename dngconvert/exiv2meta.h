@@ -76,9 +76,9 @@ public:
     }
 
 private:
+    AutoPtr<dng_exif> m_Exif;
+    AutoPtr<dng_xmp> m_XMP;
     AutoPtr<dng_memory_block> m_MakerNote;
     uint32 m_MakerNoteOffset;
     dng_string m_MakerNoteByteOrder;
-    AutoPtr<dng_exif> m_Exif;
-    AutoPtr<dng_xmp> m_XMP;
 };

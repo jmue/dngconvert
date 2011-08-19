@@ -168,9 +168,9 @@ bool getExifTagData(const Exiv2::ExifData& exifData, const char* exifTagName, lo
 }
 
 Exiv2Meta::Exiv2Meta() :
-    m_MakerNote(),
     m_Exif(),
     m_XMP(),
+    m_MakerNote(),
     m_MakerNoteOffset(0)
 {
 

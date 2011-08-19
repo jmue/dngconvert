@@ -66,10 +66,10 @@ private:
     void Parse(dng_stream &stream);
 
 protected:
-    dng_rect m_ActiveArea;
+    dng_memory_allocator &m_Allocator;
     dng_pixel_buffer m_Buffer;
     AutoPtr<dng_memory_block> m_Memory;
-    dng_memory_allocator &m_Allocator;
+    dng_rect m_ActiveArea;
     dng_vector m_CameraNeutral;
     dng_string m_ModelName;
     dng_string m_MakeName;

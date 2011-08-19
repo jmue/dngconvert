@@ -387,7 +387,7 @@ void compareIfd(const dng_ifd& ifd1, const dng_ifd& ifd2)
     if (ifd1.fPlanarConfiguration != ifd2.fPlanarConfiguration)
         printf("    PlanarConfiguration: %d %d\n", ifd1.fPlanarConfiguration, ifd2.fPlanarConfiguration);
     if (ifd1.fPredictor != ifd2.fPredictor)
-        printf("    Predictor: %d\n", ifd1.fPredictor, ifd2.fPredictor);
+        printf("    Predictor: %d %d\n", ifd1.fPredictor, ifd2.fPredictor);
     if (ifd1.fPreviewInfo.fApplicationName != ifd2.fPreviewInfo.fApplicationName)
         printf("    PreviewInfo ApplicationName: '%s' '%s'\n", ifd1.fPreviewInfo.fApplicationName.Get(), ifd2.fPreviewInfo.fApplicationName.Get());
     if (ifd1.fPreviewInfo.fApplicationVersion != ifd2.fPreviewInfo.fApplicationVersion)

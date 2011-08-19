@@ -30,7 +30,7 @@ using std::min;
 using std::max;
 
 Exiv2DngStreamIO::Exiv2DngStreamIO(dng_stream& stream, dng_memory_allocator &allocator)
-    : m_Allocator(allocator), m_Stream(stream), m_MemBlock(0)
+    : m_Allocator(allocator), m_MemBlock(0), m_Stream(stream)
 {
 }
 

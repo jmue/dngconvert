@@ -50,10 +50,7 @@ void DngStreamSourceMgr::jpeg_init_buffer(jpeg_decompress_struct* cinfo)
 boolean DngStreamSourceMgr::jpeg_fill_input_buffer(jpeg_decompress_struct* cinfo)
 {
     DngStreamSourceMgr* src = (DngStreamSourceMgr*)cinfo->src;
-
-    uint32 n = std::min((uint32)max_buf, (uint32)(src->stream->Length() - src->stream->Position()));
     src->stream->Get(src->buffer, max_buf);
-
     src->next_input_byte = src->buffer;
     src->bytes_in_buffer = max_buf;
     return true;

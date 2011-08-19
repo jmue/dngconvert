@@ -30,9 +30,9 @@ using std::max;
 
 LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
     :	dng_image(dng_rect(0, 0), 0, ttShort),
-      m_Memory(),
+      m_Allocator(allocator),
       m_Buffer(),
-      m_Allocator(allocator)
+      m_Memory()
 {
     dng_file_stream stream(filename);
     Parse(stream);
@@ -40,9 +40,9 @@ LibRawImage::LibRawImage(const char *filename, dng_memory_allocator &allocator)
 
 LibRawImage::LibRawImage(dng_stream &stream, dng_memory_allocator &allocator)
     :	dng_image(dng_rect(0, 0), 0, ttShort),
-      m_Memory(),
+      m_Allocator(allocator),
       m_Buffer(),
-      m_Allocator(allocator)
+      m_Memory()
 {
     Parse(stream);
 }
@@ -477,9 +477,9 @@ LibRawImage::LibRawImage(const dng_rect &bounds,
                          uint32 pixelType,
                          dng_memory_allocator &allocator)    
     : dng_image(bounds, planes, pixelType),
-      m_Memory(),
+      m_Allocator(allocator),
       m_Buffer(),
-      m_Allocator(allocator)
+      m_Memory()
 {
     uint32 pixelSize = TagTypeSize(pixelType);
 
