@@ -165,7 +165,7 @@ int main(int argc, const char* argv [])
     {
         negative->SetQuadMosaic(rawImage->Pattern());
     }
-    else if (0 == memcmp("FUJIFILM", rawImage->MakeName().Get(), min((uint32)8, (uint32)sizeof(rawImage->MakeName().Get()))))
+    else if (0 == memcmp("FUJIFILM", rawImage->MakeName().Get(), min(static_cast<uint32>(8), static_cast<uint32>(sizeof(rawImage->MakeName().Get())))))
     {
         negative->SetFujiMosaic(0);
     }
@@ -190,10 +190,10 @@ int main(int argc, const char* argv [])
             negative->SetBayerMosaic(bayerPhase);
     }
 
-    negative->SetWhiteLevel((uint32)rawImage->WhiteLevel(0), 0);
-    negative->SetWhiteLevel((uint32)rawImage->WhiteLevel(1), 1);
-    negative->SetWhiteLevel((uint32)rawImage->WhiteLevel(2), 2);
-    negative->SetWhiteLevel((uint32)rawImage->WhiteLevel(3), 3);
+    negative->SetWhiteLevel(static_cast<uint32>(rawImage->WhiteLevel(0)), 0);
+    negative->SetWhiteLevel(static_cast<uint32>(rawImage->WhiteLevel(1)), 1);
+    negative->SetWhiteLevel(static_cast<uint32>(rawImage->WhiteLevel(2)), 2);
+    negative->SetWhiteLevel(static_cast<uint32>(rawImage->WhiteLevel(3)), 3);
 
     const dng_mosaic_info* mosaicinfo = negative->GetMosaicInfo();
     if ((mosaicinfo != NULL) && (mosaicinfo->fCFAPatternSize == dng_point(2, 2)))
@@ -350,9 +350,9 @@ int main(int argc, const char* argv [])
             streamPriv.Put(exiv2Meta.MakerNoteByteOrder().Get(), exiv2Meta.MakerNoteByteOrder().Length());
             streamPriv.Put_uint32(exiv2Meta.MakerNoteOffset());
             streamPriv.Put(exiv2Meta.MakerNoteData(), exiv2Meta.MakerNoteLength());
-            AutoPtr<dng_memory_block> blockPriv(host.Allocate((uint32)streamPriv.Length()));
+            AutoPtr<dng_memory_block> blockPriv(host.Allocate(static_cast<uint32>(streamPriv.Length())));
             streamPriv.SetReadPosition(0);
-            streamPriv.Get(blockPriv->Buffer(), (uint32)streamPriv.Length());
+            streamPriv.Get(blockPriv->Buffer(), static_cast<uint32>(streamPriv.Length()));
             negative->SetPrivateData(blockPriv);
         }
 
@@ -370,8 +370,8 @@ int main(int argc, const char* argv [])
         dng_file_stream originalDataStream(filename);
         originalDataStream.SetReadPosition(0);
 
-        uint32 forkLength = (uint32)originalDataStream.Length();
-        uint32 forkBlocks = (uint32)floor((forkLength + 65535.0) / 65536.0);
+        uint32 forkLength = static_cast<uint32>(originalDataStream.Length());
+        uint32 forkBlocks = static_cast<uint32>(floor((forkLength + 65535.0) / 65536.0));
 
         int level = Z_DEFAULT_COMPRESSION;
         int ret;
@@ -393,8 +393,7 @@ int main(int argc, const char* argv [])
 
         for (uint32 block = 0; block < forkBlocks; block++)
         {
-            uint32 originalBlockLength = (uint32)min((uint64)CHUNK,
-                                                          originalDataStream.Length() - originalDataStream.Position());
+            uint32 originalBlockLength = static_cast<uint32>(min(static_cast<uint64>(CHUNK), originalDataStream.Length() - originalDataStream.Position()));
             originalDataStream.Get(inBuffer, originalBlockLength);
 
             /* allocate deflate state */
@@ -438,9 +437,9 @@ int main(int argc, const char* argv [])
         embedDataStream.Put_uint32(0);
         embedDataStream.Put_uint32(0);
 
-        AutoPtr<dng_memory_block> block(host.Allocate((uint32)embedDataStream.Length()));
+        AutoPtr<dng_memory_block> block(host.Allocate(static_cast<uint32>(embedDataStream.Length())));
         embedDataStream.SetReadPosition(0);
-        embedDataStream.Get(block->Buffer(), (uint32)embedDataStream.Length());
+        embedDataStream.Get(block->Buffer(), static_cast<uint32>(embedDataStream.Length()));
 
         dng_md5_printer md5;
         md5.Process(block->Buffer(), block->LogicalSize());
@@ -481,8 +480,8 @@ int main(int argc, const char* argv [])
     jpeg_preview->fPhotometricInterpretation = piYCbCr;
     jpeg_preview->fPreviewSize               = jpegImage->Size();
     jpeg_preview->fYCbCrSubSampling          = dng_point(2, 2);
-    jpeg_preview->fCompressedData.Reset(host.Allocate((uint32)dms->Length()));
-    dms->Get(jpeg_preview->fCompressedData->Buffer_char(), (uint32)dms->Length());
+    jpeg_preview->fCompressedData.Reset(host.Allocate(static_cast<uint32>(dms->Length())));
+    dms->Get(jpeg_preview->fCompressedData->Buffer_char(), static_cast<uint32>(dms->Length()));
     jpeg_preview->fInfo.fApplicationName.Set_ASCII("DNG SDK");
     jpeg_preview->fInfo.fApplicationVersion.Set_ASCII("1.3");
     //jpeg_preview->fInfo.fDateTime = ;

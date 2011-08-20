@@ -132,7 +132,7 @@ bool getExifTag(const Exiv2::ExifData& exifData, const char* exifTagName, int32 
         Exiv2::ExifData::const_iterator it = exifData.findKey(Exiv2::ExifKey(exifTagName));
         if (it != exifData.end() && it->count() > 0)
         {
-            *value = (uint32)it->toLong(component);
+            *value = static_cast<uint32>(it->toLong(component));
             return true;
         }
     }
@@ -369,9 +369,9 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
             m_Exif->fLensID.Set_ASCII(lensType);
         }
         if (getExifTag(exifData, "Exif.NikonLd2.FocusDistance", 0, &val))
-            m_Exif->fSubjectDistance = dng_urational((uint32)pow(10.0, val/40.0), 100);
+            m_Exif->fSubjectDistance = dng_urational(static_cast<uint32>(pow(10.0, val/40.0)), 100);
         if (getExifTag(exifData, "Exif.NikonLd3.FocusDistance", 0, &val))
-            m_Exif->fSubjectDistance = dng_urational((uint32)pow(10.0, val/40.0), 100);
+            m_Exif->fSubjectDistance = dng_urational(static_cast<uint32>(pow(10.0, val/40.0)), 100);
         getExifTag(exifData, "Exif.NikonLd1.LensIDNumber", &m_Exif->fLensName);
         getExifTag(exifData, "Exif.NikonLd2.LensIDNumber", &m_Exif->fLensName);
         getExifTag(exifData, "Exif.NikonLd3.LensIDNumber", &m_Exif->fLensName);

@@ -44,8 +44,8 @@ int LibRawDngDataStream::read(void* ptr, size_t size, size_t nmemb)
         return substream->read(ptr, size, nmemb);
 
     uint64 oldPos = m_Stream.Position();
-    uint64 bytes = min((uint64)size*nmemb, m_Stream.Length() - oldPos);
-    m_Stream.Get(ptr, (int32)bytes);
+    uint64 bytes = min(static_cast<uint64>(size*nmemb), m_Stream.Length() - oldPos);
+    m_Stream.Get(ptr, static_cast<uint32>(bytes));
     return int((m_Stream.Position() - oldPos + size - 1) / size);
 }
 

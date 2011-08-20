@@ -219,7 +219,7 @@ int main(int argc, const char* argv [])
                 compressedDataStream.SetReadPosition(0);
                 compressedDataStream.SetBigEndian(true);
                 uint32 forkLength = compressedDataStream.Get_uint32();
-                uint32 forkBlocks = (uint32)floor((forkLength + 65535.0) / 65536.0);
+                uint32 forkBlocks = static_cast<uint32>(floor((forkLength + 65535.0) / 65536.0));
                 std::vector<uint32> offsets;
                 for(uint32 block = 0; block <= forkBlocks; block++)
                 {

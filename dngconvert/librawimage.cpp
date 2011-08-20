@@ -138,8 +138,8 @@ void LibRawImage::Parse(dng_stream &stream)
     bool entireSensorData = false;
 #if (LIBRAW_COMPILE_CHECK_VERSION_NOTLESS(0,14))
     entireSensorData = true;
-    rawWidth = max(rawWidth, (uint32)(sizes->width + sizes->left_margin));
-    rawHeight = max(rawHeight, (uint32)(sizes->height + sizes->top_margin));
+    rawWidth = max(rawWidth, static_cast<uint32>(sizes->width + sizes->left_margin));
+    rawHeight = max(rawHeight, static_cast<uint32>(sizes->height + sizes->top_margin));
 #else
     if (0 == strcmp(iparams->make, "Canon") && (iparams->filters != 0))
     {
@@ -201,7 +201,7 @@ void LibRawImage::Parse(dng_stream &stream)
         fBounds = dng_rect(activeHeight, activeWidth);
 
     m_Pattern = iparams->filters;
-    m_Channels = (uint32)iparams->colors;
+    m_Channels = static_cast<uint32>(iparams->colors);
 
     fPlanes = (m_Pattern == 0) ? 3 : 1;
     uint32 pixelType = ttShort;

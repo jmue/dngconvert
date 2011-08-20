@@ -93,8 +93,8 @@ Exiv2::DataBuf Exiv2DngStreamIO::read(long rcount)
 long Exiv2DngStreamIO::read(Exiv2::byte* buf, long rcount)
 {
     uint64 oldPos = m_Stream.Position();
-    uint64 bytes = min((uint64)rcount, m_Stream.Length() - oldPos);
-    m_Stream.Get((void*)buf, (int32)bytes);
+    uint64 bytes = min(static_cast<uint64>(rcount), m_Stream.Length() - oldPos);
+    m_Stream.Get((void*)buf, static_cast<uint32>(bytes));
     return (long)(m_Stream.Position() - oldPos);
 }
 
