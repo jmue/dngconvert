@@ -14,7 +14,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source
                     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/common
                     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/public/include
                     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/build
-                    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/third-party/MD5
+                    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/MD5
                    )
 
 # Set platteforms env.
@@ -32,7 +32,7 @@ ENDIF(WIN32)
 
 SET( LIBXMPSDK_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/ExpatAdapter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/third-party/MD5/MD5.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/MD5/MD5.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/ParseRDF.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/common/UnicodeConversions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/xmpsdk/source/XMPCore/WXMPIterator.cpp
