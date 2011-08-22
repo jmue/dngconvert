@@ -15,10 +15,6 @@
    along with this library; see the file COPYING.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.
-
-   This file uses code from dng_threaded_host.cpp -- Sandy McGuffog CornerFix utility
-   (http://sourceforge.net/projects/cornerfix, sandy dot cornerfix at gmail dot com),
-   dng_threaded_host.cpp is copyright 2007-2011, by Sandy McGuffog and Contributors.
 */
 
 #pragma once
@@ -32,6 +28,6 @@ public:
     ~DngExif(void);
 
 protected:
-    virtual bool Parse_ifd0_exif (dng_stream &stream, dng_shared &shared, uint32 parentCode, uint32 tagCode, uint32 tagType, uint32 tagCount, uint64 tagOffset);
+    virtual bool Parse_ifd0_exif(dng_stream &stream, dng_shared &shared, uint32 parentCode, uint32 tagCode, uint32 tagType, uint32 tagCount, uint64 tagOffset);
 };
 

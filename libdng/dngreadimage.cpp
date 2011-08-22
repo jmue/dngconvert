@@ -64,8 +64,8 @@ void DngStreamSourceMgr::jpeg_skip_input_data(jpeg_decompress_struct* cinfo, lon
     {
         while (num_bytes > (long) src->bytes_in_buffer)
         {
-	    num_bytes -= (long) src->bytes_in_buffer;
-	    (void) jpeg_fill_input_buffer(cinfo);
+            num_bytes -= (long) src->bytes_in_buffer;
+            (void) jpeg_fill_input_buffer(cinfo);
         }
     }
     src->next_input_byte += (size_t) num_bytes;
@@ -106,10 +106,10 @@ struct DngStreamErrorMgr
 DngStreamErrorMgr::DngStreamErrorMgr(dng_host* h)
 {
     /*
-  jpeg_error_mgr::output_message = ;
-  jpeg_error_mgr::emit_message = ;
-  jpeg_error_mgr::output_message = ;
-  */
+    jpeg_error_mgr::output_message = ;
+    jpeg_error_mgr::emit_message = ;
+    jpeg_error_mgr::output_message = ;
+    */
     this->host = h;
 }
 
@@ -172,7 +172,7 @@ bool DngReadImage::ReadBaselineJPEG(dng_host& host,
     JSAMPROW row_pointer;
     while (cinfo.output_scanline < cinfo.output_height)
     {
-        row_pointer = (JSAMPROW) buffer.ConstPixel_uint8(cinfo.output_scanline, 0);
+        row_pointer = (JSAMPROW)buffer.ConstPixel_uint8(cinfo.output_scanline, 0);
         jpeg_read_scanlines(&cinfo, &row_pointer, 1);
     }
 

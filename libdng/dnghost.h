@@ -31,5 +31,5 @@ public:
     virtual dng_exif* Make_dng_exif();
     virtual dng_ifd* Make_dng_ifd();
     virtual dng_negative* Make_dng_negative();
-    virtual void PerformAreaTask (dng_area_task &task, const dng_rect &area);
+    virtual void PerformAreaTask(dng_area_task &task, const dng_rect &area);
 };

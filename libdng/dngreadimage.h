@@ -28,6 +28,6 @@ public:
     ~DngReadImage(void);
 
 protected:
-    virtual bool ReadBaselineJPEG (dng_host &host, const dng_ifd &ifd, dng_stream &stream,
-                                   dng_image &image, const dng_rect &tileArea, uint32 plane, uint32 planes, uint32 tileByteCount);
+    virtual bool ReadBaselineJPEG(dng_host &host, const dng_ifd &ifd, dng_stream &stream,
+                                  dng_image &image, const dng_rect &tileArea, uint32 plane, uint32 planes, uint32 tileByteCount);
 };
