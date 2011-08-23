@@ -1,3 +1,6 @@
-You need a copy of Adobe DNG SDK (http://www.adobe.com/support/downloads/dng/dng_sdk.html) 
-and Adobe XMP SDK (http://www.adobe.com/devnet/xmp/sdk/eula.html) which is not included 
-in this repository. Please copy the contents to the appropriate folder under libdng/contrib.
+This is a set of tools regarding DNG image files. It contains of:
+- dngconvert, a tool to convert Raw files (CRW, CR2, NEF, ARW, MRW, ...) to DNG
+- dngcompare, a tool to compare two DNGs against each other
+- dnganalyze, print basic file informations, extraxt embedded originals
+
+You need LibRaw, libexiv2, zlib & libjpeg to compile the sources.
