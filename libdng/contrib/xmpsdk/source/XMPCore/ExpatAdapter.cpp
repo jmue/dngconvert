@@ -249,9 +249,9 @@ static void SetQualName ( ExpatAdapter * thiz, XMP_StringPtr fullName, XML_Node 
 
 static void StartNamespaceDeclHandler ( void * userData, XMP_StringPtr prefix, XMP_StringPtr uri )
 {
-	IgnoreParam(userData);
-	
-	// As a bug fix hack, change a URI of "http://purl.org/dc/1.1/" to ""http://purl.org/dc/elements/1.1/.
+        IgnoreParam(userData);
+
+        // As a bug fix hack, change a URI of "http://purl.org/dc/1.1/" to ""http://purl.org/dc/elements/1.1/.
 	// Early versions of Flash that put XMP in SWF used a bad URI for the dc: namespace.
 	
 	ExpatAdapter * thiz = (ExpatAdapter*)userData;
@@ -275,9 +275,9 @@ static void StartNamespaceDeclHandler ( void * userData, XMP_StringPtr prefix, X
 
 static void EndNamespaceDeclHandler ( void * userData, XMP_StringPtr prefix )
 {
-	IgnoreParam(userData);
+        IgnoreParam(userData);
 
-	#if XMP_DebugBuild & DumpXMLParseEvents		// Avoid unused variable warning.
+        #if XMP_DebugBuild & DumpXMLParseEvents		// Avoid unused variable warning.
 		ExpatAdapter * thiz = (ExpatAdapter*)userData;
 	#endif
 
@@ -354,9 +354,9 @@ static void StartElementHandler ( void * userData, XMP_StringPtr name, XMP_Strin
 
 static void EndElementHandler ( void * userData, XMP_StringPtr name )
 {
-	IgnoreParam(name);
-	
-	ExpatAdapter * thiz = (ExpatAdapter*)userData;
+        IgnoreParam(name);
+
+        ExpatAdapter * thiz = (ExpatAdapter*)userData;
 
 	#if XMP_DebugBuild
 		--thiz->elemNesting;
@@ -401,9 +401,9 @@ static void CharacterDataHandler ( void * userData, XMP_StringPtr cData, int len
 
 static void StartCdataSectionHandler ( void * userData )
 {
-	IgnoreParam(userData);
+        IgnoreParam(userData);
 
-	#if XMP_DebugBuild & DumpXMLParseEvents		// Avoid unused variable warning.
+        #if XMP_DebugBuild & DumpXMLParseEvents		// Avoid unused variable warning.
 		ExpatAdapter * thiz = (ExpatAdapter*)userData;
 	#endif
 	

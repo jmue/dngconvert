@@ -361,7 +361,7 @@ DumpClearString ( const XMP_VarString & value, XMP_TextOutputProc outProc, void 
 	
 		// Output the next span of regular characters.
 		for ( spanEnd = spanStart; spanEnd < valueEnd; ++spanEnd ) {
-			if ( *spanEnd > 0x7F ) break;
+                        //if ( *spanEnd > 0x7F ) break;
 			if ( (*spanEnd < 0x20) && (*spanEnd != kTab) && (*spanEnd != kLF) ) break;
 		}
 		if ( spanStart != spanEnd ) status = (*outProc) ( refCon,  spanStart, (XMP_StringLen)(spanEnd-spanStart) );
@@ -371,7 +371,7 @@ DumpClearString ( const XMP_VarString & value, XMP_TextOutputProc outProc, void 
 		// Output the next span of irregular characters.
 		prevNormal = true;
 		for ( spanEnd = spanStart; spanEnd < valueEnd; ++spanEnd ) {
-			if ( ((0x20 <= *spanEnd) && (*spanEnd <= 0x7F)) || (*spanEnd == kTab) || (*spanEnd == kLF) ) break;
+                        if ( ((0x20 <= *spanEnd) /*&& (*spanEnd <= 0x7F)*/) || (*spanEnd == kTab) || (*spanEnd == kLF) ) break;
 			char space = ' ';
 			if ( prevNormal ) space = '<';
 			status = (*outProc) ( refCon, &space, 1 );

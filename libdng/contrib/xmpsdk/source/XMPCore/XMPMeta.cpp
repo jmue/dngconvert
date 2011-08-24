@@ -637,7 +637,7 @@ RegisterStandardAliases()
 // ============
 
 
-XMPMeta::XMPMeta() : tree(XMP_Node(0,"",0)), clientRefs(0), prevTkVer(0), xmlParser(0)
+XMPMeta::XMPMeta() : clientRefs(0), prevTkVer(0), tree(XMP_Node(0,"",0)), xmlParser(0)
 {
 	// Nothing more to do, clientRefs is incremented in wrapper.
 	#if XMP_TraceCTorDTor
@@ -808,7 +808,8 @@ XMPMeta::Initialize()
 	XMP_Assert ( sizeof(XMP_Uns64) == 8 );
 	
 	XMP_Assert ( sizeof(XMP_OptionBits) == 4 );	// Check that option masking work on all 32 bits.
-	XMP_OptionBits flag = (XMP_OptionBits) (~0UL);
+        XMP_OptionBits flag;
+        flag = (XMP_OptionBits) (~0UL);
 	XMP_Assert ( flag == (XMP_OptionBits)(-1L) );
 	XMP_Assert ( (flag ^ kXMP_PropHasLang) == 0xFFFFFFBFUL );
 	XMP_Assert ( (flag & ~kXMP_PropHasLang) == 0xFFFFFFBFUL );
@@ -999,7 +1000,7 @@ XMPMeta::GetNamespaceURI ( XMP_StringPtr   namespacePrefix,
 // *** restricted to the object that introduced them.
 
 /* class-static */ void
-XMPMeta::DeleteNamespace ( XMP_StringPtr namespaceURI )
+XMPMeta::DeleteNamespace ( XMP_StringPtr /*namespaceURI*/ )
 {
 
 	XMP_Throw ( "Unimplemented method XMPMeta::DeleteNamespace", kXMPErr_Unimplemented );

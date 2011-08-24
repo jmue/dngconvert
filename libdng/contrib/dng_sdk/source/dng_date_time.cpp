@@ -74,9 +74,9 @@ bool dng_date_time::IsValid () const
 	return fYear   >= 1 && fYear   <= 9999 &&
 		   fMonth  >= 1 && fMonth  <= 12   &&
 		   fDay    >= 1 && fDay    <= 31   &&
-		   fHour   >= 0 && fHour   <= 23   &&
-		   fMinute >= 0 && fMinute <= 59   &&
-		   fSecond >= 0 && fSecond <= 59;
+                   /*fHour   >= 0 &&*/ fHour   <= 23   &&
+                   /*fMinute >= 0 &&*/ fMinute <= 59   &&
+                   /*fSecond >= 0 &&*/ fSecond <= 59;
 	
 	}
 			

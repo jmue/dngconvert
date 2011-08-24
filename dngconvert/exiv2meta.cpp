@@ -602,7 +602,7 @@ void Exiv2Meta::Parse(dng_host &host, dng_stream &stream)
     }
 }
 
-void Exiv2Meta::PostParse (dng_host &host)
+void Exiv2Meta::PostParse (dng_host& /*host*/)
 {
 
 }

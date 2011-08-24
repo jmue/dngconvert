@@ -1783,7 +1783,7 @@ void dng_xmp::SyncIPTC (dng_iptc &iptc,
 					 x == 0xFFFFFFFF,
 					 options);
 					 
-		if (x >= 0 && x <= 9)
+                if (/*x >= 0 &&*/ x <= 9)
 			{
 			
 			iptc.fUrgency = (int32) x;

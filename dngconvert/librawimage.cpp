@@ -564,7 +564,7 @@ const dng_matrix& LibRawImage::ColorMatrix() const
     return m_ColorMatrix;
 }
 
-const real64 LibRawImage::BlackLevel(uint32 channel) const
+real64 LibRawImage::BlackLevel(uint32 channel) const
 {
     if (channel < m_BlackLevel.Count())
     {
@@ -574,7 +574,7 @@ const real64 LibRawImage::BlackLevel(uint32 channel) const
     return 0.0;
 }
 
-const real64 LibRawImage::WhiteLevel(uint32 channel) const
+real64 LibRawImage::WhiteLevel(uint32 channel) const
 {
     if (channel < m_WhiteLevel.Count())
     {

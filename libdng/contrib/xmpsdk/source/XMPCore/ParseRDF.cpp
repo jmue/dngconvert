@@ -324,7 +324,7 @@ IsCoreSyntaxTerm ( RDFTermKind term )
 //
 // 7.2.3 syntaxTerms
 //		coreSyntaxTerms | rdf:Description | rdf:li
-
+/*
 static bool
 IsSyntaxTerm ( RDFTermKind term )
 {
@@ -333,7 +333,7 @@ IsSyntaxTerm ( RDFTermKind term )
 	return false;
 
 }	// IsSyntaxTerm
-
+*/
 // -------------------------------------------------------------------------------------------------
 // IsOldTerm
 // ---------
@@ -356,7 +356,7 @@ IsOldTerm ( RDFTermKind term )
 //
 // 7.2.5 nodeElementURIs
 //		anyURI - ( coreSyntaxTerms | rdf:li | oldTerms )
-
+/*
 static bool
 IsNodeElementName ( RDFTermKind term )
 {
@@ -365,7 +365,7 @@ IsNodeElementName ( RDFTermKind term )
 	return (! IsCoreSyntaxTerm ( term ));
 
 }	// IsNodeElementName
-
+*/
 // -------------------------------------------------------------------------------------------------
 // IsPropertyElementName
 // ---------------------
@@ -388,7 +388,7 @@ IsPropertyElementName ( RDFTermKind term )
 //
 // 7.2.7 propertyAttributeURIs
 //		anyURI - ( coreSyntaxTerms | rdf:Description | rdf:li | oldTerms )
-
+/*
 static bool
 IsPropertyAttributeName ( RDFTermKind term )
 {
@@ -397,7 +397,7 @@ IsPropertyAttributeName ( RDFTermKind term )
 	return (! IsCoreSyntaxTerm ( term ));
 
 }	// IsPropertyAttributeName
-
+*/
 
 // =================================================================================================
 // AddChildNode

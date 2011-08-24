@@ -33,8 +33,9 @@ struct DngStreamSourceMgr
 {
     JOCTET buffer[max_buf];
     dng_stream* stream;
+    uint32 bytes;
 
-    DngStreamSourceMgr(dng_stream* s);
+    DngStreamSourceMgr(dng_stream* s, uint32 b);
 
     static void jpeg_init_buffer(jpeg_decompress_struct* cinfo);
     static boolean jpeg_fill_input_buffer(jpeg_decompress_struct* cinfo);
@@ -43,7 +44,7 @@ struct DngStreamSourceMgr
     static void jpeg_term_source(jpeg_decompress_struct* cinfo);
 };
 
-void DngStreamSourceMgr::jpeg_init_buffer(jpeg_decompress_struct* cinfo)
+void DngStreamSourceMgr::jpeg_init_buffer(jpeg_decompress_struct* /*cinfo*/)
 {
 }
 
@@ -62,26 +63,26 @@ void DngStreamSourceMgr::jpeg_skip_input_data(jpeg_decompress_struct* cinfo, lon
 
     if (num_bytes > 0)
     {
-        while (num_bytes > (long) src->bytes_in_buffer)
+        while (num_bytes > static_cast<long>(src->bytes_in_buffer))
         {
-            num_bytes -= (long) src->bytes_in_buffer;
-            (void) jpeg_fill_input_buffer(cinfo);
+            num_bytes -= static_cast<long>(src->bytes_in_buffer);
+            (void)jpeg_fill_input_buffer(cinfo);
         }
     }
-    src->next_input_byte += (size_t) num_bytes;
-    src->bytes_in_buffer -= (size_t) num_bytes;
+    src->next_input_byte += static_cast<size_t>(num_bytes);
+    src->bytes_in_buffer -= static_cast<size_t>(num_bytes);
 }
 
-boolean DngStreamSourceMgr::jpeg_resync_to_restart(jpeg_decompress_struct* cinfo, int desired)
+boolean DngStreamSourceMgr::jpeg_resync_to_restart(jpeg_decompress_struct* /*cinfo*/, int /*desired*/)
 {
     return false;
 }
 
-void DngStreamSourceMgr::jpeg_term_source(jpeg_decompress_struct* cinfo)
+void DngStreamSourceMgr::jpeg_term_source(jpeg_decompress_struct* /*cinfo*/)
 {
 }
 
-DngStreamSourceMgr::DngStreamSourceMgr(dng_stream* s)
+DngStreamSourceMgr::DngStreamSourceMgr(dng_stream* s, uint32 b)
 {
     jpeg_source_mgr::init_source       = jpeg_init_buffer;
     jpeg_source_mgr::fill_input_buffer = jpeg_fill_input_buffer;
@@ -90,6 +91,7 @@ DngStreamSourceMgr::DngStreamSourceMgr(dng_stream* s)
     jpeg_source_mgr::term_source       = jpeg_term_source;
 
     this->stream = s;
+    this->bytes = b;
 
     bytes_in_buffer = 0;
     next_input_byte = buffer;
@@ -122,12 +124,12 @@ DngReadImage::~DngReadImage(void)
 }
 
 bool DngReadImage::ReadBaselineJPEG(dng_host& host,
-                                    const dng_ifd& ifd,
+                                    const dng_ifd& /*ifd*/,
                                     dng_stream& stream,
                                     dng_image& image,
-                                    const dng_rect& tileArea,
-                                    uint32 plane,
-                                    uint32 planes,
+                                    const dng_rect& /*tileArea*/,
+                                    uint32 /*plane*/,
+                                    uint32 /*planes*/,
                                     uint32 tileByteCount)
 {
     uint64 startPos = stream.Position();
@@ -142,7 +144,7 @@ bool DngReadImage::ReadBaselineJPEG(dng_host& host,
     }
     stream.SetReadPosition(startPos);
 
-    DngStreamSourceMgr smgr(&stream);
+    DngStreamSourceMgr smgr(&stream, tileByteCount);
     DngStreamErrorMgr jerr(&host);
 
     AutoPtr<dng_memory_block> dstData(host.Allocate(image.Width() * image.Height() * 3 * sizeof(uint8)));

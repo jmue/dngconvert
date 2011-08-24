@@ -136,7 +136,7 @@ int Exiv2DngStreamIO::seek(long offset, Position pos)
         break;
     }
 
-    if (newIdx < 0 || newIdx > length)
+    if (newIdx > length)
         return 1;
 
     m_Stream.SetReadPosition(newIdx);
@@ -144,7 +144,7 @@ int Exiv2DngStreamIO::seek(long offset, Position pos)
     return 0;
 }
 
-Exiv2::byte* Exiv2DngStreamIO::mmap(bool isWriteable)
+Exiv2::byte* Exiv2DngStreamIO::mmap(bool /*isWriteable*/)
 {
     m_MemBlock = std::auto_ptr<dng_memory_block>(m_Stream.AsMemoryBlock(m_Allocator));
     return (Exiv2::byte*)m_MemBlock.get()->Buffer();

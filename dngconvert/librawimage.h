@@ -47,8 +47,8 @@ public:
     const dng_rect& ActiveArea() const;
     uint32 Channels() const;
     const dng_matrix& ColorMatrix() const;
-    const real64 BlackLevel(uint32 channel) const;
-    const real64 WhiteLevel(uint32 channel) const;
+    real64 BlackLevel(uint32 channel) const;
+    real64 WhiteLevel(uint32 channel) const;
     const dng_urational& DefaultScaleH() const;
     const dng_urational& DefaultScaleV() const;
     const dng_urational& DefaultCropSizeH() const;

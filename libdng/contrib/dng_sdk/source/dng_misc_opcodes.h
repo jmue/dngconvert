@@ -87,22 +87,22 @@ class dng_area_spec
 			return fArea;
 			}
 		
-		const uint32 Plane () const
+                uint32 Plane () const
 			{
 			return fPlane;
 			}
 		
-		const uint32 Planes () const
+                uint32 Planes () const
 			{
 			return fPlanes;
 			}
 		
-		const uint32 RowPitch () const
+                uint32 RowPitch () const
 			{
 			return fRowPitch;
 			}
 		
-		const uint32 ColPitch () const
+                uint32 ColPitch () const
 			{
 			return fColPitch;
 			}

@@ -444,8 +444,8 @@ const char * LookupTagCode (uint32 parentCode,
 	if (parentCode == 0         										 ||
 		parentCode == tcExifIFD 										 ||
 		parentCode == tcLeafMOS 										 ||
-		parentCode >= tcFirstSubIFD     && parentCode <= tcLastSubIFD    ||
-		parentCode >= tcFirstChainedIFD && parentCode <= tcLastChainedIFD)
+                (parentCode >= tcFirstSubIFD     && parentCode <= tcLastSubIFD)    ||
+                (parentCode >= tcFirstChainedIFD && parentCode <= tcLastChainedIFD))
 		{
 		
 		name = LookupName (tagCode,

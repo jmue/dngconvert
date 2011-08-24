@@ -1748,7 +1748,7 @@ void dng_info::ParseDNGPrivateData (dng_host &host,
 											: stream.Get_uint16 ();
 											 
 					uint32 tagType  = hasType ? stream.Get_uint16 () 
-											  : ttUndefined;
+                                                                                          : static_cast<uint32>(ttUndefined);
 					
 					uint32 tagCount = stream.Get_uint32 ();
 					

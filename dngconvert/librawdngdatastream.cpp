@@ -69,9 +69,7 @@ int LibRawDngDataStream::seek(INT64 offset, int whence)
         break;
     }
 
-    if(newIdx < 0)
-        newIdx = 0;
-    else if (newIdx > length)
+    if (newIdx > length)
         newIdx = length;
 
     m_Stream.SetReadPosition(newIdx);

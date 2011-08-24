@@ -30,8 +30,8 @@ dng_simple_image::dng_simple_image (const dng_rect &bounds,
 				   planes,
 				   pixelType)
 				   
-	,	fMemory    ()
-	,	fBuffer    ()
+        ,	fBuffer    ()
+        ,	fMemory    ()
 	,	fAllocator (allocator)
 				   
 	{

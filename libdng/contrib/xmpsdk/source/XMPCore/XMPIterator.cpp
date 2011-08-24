@@ -368,7 +368,7 @@ XMPIterator::Terminate() RELEASE_NO_THROW
 XMPIterator::XMPIterator ( const XMPMeta & xmpObj,
 						   XMP_StringPtr   schemaNS,
 						   XMP_StringPtr   propName,
-						   XMP_OptionBits  options ) : info(IterInfo(options,&xmpObj)), clientRefs(0)
+                                                   XMP_OptionBits  options ) : clientRefs(0), info(IterInfo(options,&xmpObj))
 {
 	if ( (options & kXMP_IterClassMask) != kXMP_IterProperties ) {
 		XMP_Throw ( "Unsupported iteration kind", kXMPErr_BadOptions );
@@ -488,7 +488,7 @@ XMPIterator::XMPIterator ( const XMPMeta & xmpObj,
 
 XMPIterator::XMPIterator ( XMP_StringPtr  schemaNS,
 						   XMP_StringPtr  propName,
-						   XMP_OptionBits options ) : info(IterInfo(options,0)), clientRefs(0)
+                                                   XMP_OptionBits options ) : clientRefs(0), info(IterInfo(options,0))
 {
 
 	XMP_Throw ( "Unimplemented XMPIterator constructor for global tables", kXMPErr_Unimplemented );

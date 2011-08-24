@@ -953,14 +953,14 @@ exif_tag_set::exif_tag_set (dng_tiff_directory &directory,
 	
 	,	fCopyright (tcCopyright, exif.fCopyright)
 	
-	,	fMakerNoteSafety (tcMakerNoteSafety, makerNoteSafe ? 1 : 0)
+        ,	fImageDescription (tcImageDescription, exif.fImageDescription)
+
+        ,	fSerialNumber (tcCameraSerialNumber, exif.fCameraSerialNumber)
+
+        ,	fMakerNoteSafety (tcMakerNoteSafety, makerNoteSafe ? 1 : 0)
 	
 	,	fMakerNote (tcMakerNote, ttUndefined, makerNoteLength, makerNoteData)
 					
-	,	fImageDescription (tcImageDescription, exif.fImageDescription)
-	
-	,	fSerialNumber (tcCameraSerialNumber, exif.fCameraSerialNumber)
-	
 	,	fUserComment (tcUserComment, exif.fUserComment)
 	
 	,	fImageUniqueID (tcImageUniqueID, ttAscii, 33, fImageUniqueIDData)

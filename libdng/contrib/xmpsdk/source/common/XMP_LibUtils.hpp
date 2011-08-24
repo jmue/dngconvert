@@ -40,8 +40,8 @@ typedef std::string XMP_VarString;
 extern "C" bool Initialize_LibUtils();
 extern "C" void Terminate_LibUtils();
 
-static void * ignorePtr = 0;
-#define IgnoreParam(p)	ignorePtr = (void*)&p
+//static void * ignorePtr = 0;
+#define IgnoreParam(p)	{ static void * ignorePtr = 0; ignorePtr = (void*)&p; }
 
 // The builtin offsetof macro sometimes violates C++ data member rules.
 #define XMP_OffsetOf(struct,field)	( (char*)(&((struct*)0x100)->field) - (char*)0x100 )
@@ -455,9 +455,9 @@ private:
 #define IsHexDigit(ch)		( (('0' <= (ch)) && ((ch) <= '9')) || (('A' <= (ch)) && ((ch) <= 'F')) )
 #define HexDigitValue(ch)	( (((ch) - '0') < 10) ? ((ch) - '0') : ((ch) - 'A' + 10) )
 
-static const char * kTenSpaces = "          ";
+//static const char * kTenSpaces = "          ";
 #define OutProcPadding(pad)	{ size_t padLen = (pad); 												\
-							  for ( ; padLen >= 10; padLen -= 10 ) OutProcNChars ( kTenSpaces, 10 );	\
+                                                          for ( ; padLen >= 10; padLen -= 10 ) OutProcNChars ( "          ", 10 );	\
 							  for ( ; padLen > 0; padLen -= 1 ) OutProcNChars ( " ", 1 ); }
 
 
@@ -478,8 +478,8 @@ static const char * kTenSpaces = "          ";
 #define OutProcHexByte(num)	{ snprintf ( buffer, sizeof(buffer), "%.2X", (num) ); /* AUDIT: Using sizeof for snprintf length is safe */	\
 							  XMP_Status status = (*outProc) ( refCon, buffer, (XMP_StringLen)strlen(buffer) );  if ( status != 0 ) return; }
 
-static const char * kIndent = "   ";
-#define OutProcIndent(lev)	{ for ( size_t i = 0; i < (lev); ++i ) OutProcNChars ( kIndent, 3 ); }
+//static const char * kIndent = "   ";
+#define OutProcIndent(lev)	{ for ( size_t i = 0; i < (lev); ++i ) OutProcNChars ( "   ", 3 ); }
 
 void DumpClearString ( const XMP_VarString & value, XMP_TextOutputProc outProc, void * refCon );
 

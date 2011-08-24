@@ -76,8 +76,12 @@ class cppThread
     }
 
 public:
+#if qWinOS
     cppThread() :
-	thread(NULL)
+        thread(NULL)
+#else
+    cppThread()
+#endif
     {
 #if qWinOS
 #else

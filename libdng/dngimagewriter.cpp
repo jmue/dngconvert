@@ -40,7 +40,7 @@ struct DngStreamDestinationMgr
     static void jpeg_term_buffer(jpeg_compress_struct* cinfo);
 };
 
-void DngStreamDestinationMgr::jpeg_init_buffer(jpeg_compress_struct* cinfo)
+void DngStreamDestinationMgr::jpeg_init_buffer(jpeg_compress_struct* /*cinfo*/)
 {
 }
 
@@ -178,7 +178,7 @@ void DngImageWriter::WriteJPEG(dng_host &host,
     JSAMPROW row_pointer;
     while (cinfo.next_scanline < cinfo.image_height)
     {
-        row_pointer = (JSAMPROW) buffer.ConstPixel_uint8(cinfo.next_scanline, 0);
+        row_pointer = (JSAMPROW)buffer.ConstPixel_uint8(cinfo.next_scanline, 0);
         jpeg_write_scanlines(&cinfo, &row_pointer, 1);
     }
 
