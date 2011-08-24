@@ -26,7 +26,7 @@
 #include <string>
 #include <assert.h>
 
-#include "dngconvertconfig.h"
+#include "config.h"
 
 #include "dng_bad_pixels.h"
 #include "dng_camera_profile.h"
@@ -63,6 +63,8 @@
 
 using std::min;
 using std::max;
+
+const char* version() { return DNGCONVERT_VERSION_STR; }
 
 int main(int argc, const char* argv [])
 {  
@@ -288,6 +290,13 @@ int main(int argc, const char* argv [])
 
     // -----------------------------------------------------------------------------------------
 
+    dng_date_time_info dateTimeNow;
+    CurrentDateTimeAndZone(dateTimeNow);
+
+    dng_string appVersion;
+    appVersion.Append("dngconvert ");
+    appVersion.Append(version());
+
     // Exif CFA Pattern
     if (mosaicinfo != NULL)
     {
@@ -320,6 +329,8 @@ int main(int argc, const char* argv [])
         // Exif Data
         dng_xmp xmpSync(memalloc);
         dng_exif* exifData = exiv2Meta.GetExif();
+        exifData->fDateTime = dateTimeNow;
+        exifData->fSoftware.Set_ASCII(appVersion.Get());
         if (exifData != NULL)
         {
             xmpSync.SyncExif(*exifData);
@@ -482,9 +493,9 @@ int main(int argc, const char* argv [])
     jpeg_preview->fYCbCrSubSampling          = dng_point(2, 2);
     jpeg_preview->fCompressedData.Reset(host.Allocate(static_cast<uint32>(dms->Length())));
     dms->Get(jpeg_preview->fCompressedData->Buffer_char(), static_cast<uint32>(dms->Length()));
-    jpeg_preview->fInfo.fApplicationName.Set_ASCII("DNG SDK");
-    jpeg_preview->fInfo.fApplicationVersion.Set_ASCII("1.3");
-    //jpeg_preview->fInfo.fDateTime = ;
+    jpeg_preview->fInfo.fApplicationName.Set_ASCII("dngconvert");
+    jpeg_preview->fInfo.fApplicationVersion.Set_ASCII(appVersion.Get());
+    jpeg_preview->fInfo.fDateTime = dateTimeNow.Encode_ISO_8601();
     jpeg_preview->fInfo.fColorSpace = previewColorSpace_sRGB;
 
     AutoPtr<dng_preview> pp(dynamic_cast<dng_preview*>(jpeg_preview.Release()));
